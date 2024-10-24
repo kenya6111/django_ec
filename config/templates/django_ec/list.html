@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
-
+{% load app_tag %}
 {% block content %}
-
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container px-4 px-lg-5">
@@ -51,7 +50,19 @@
                                     <!-- Product name-->
                                     <h5 class="fw-bolder">{{ object.name}}</h5>
                                     <!-- Product price-->
-                                    ${{object.price}}
+                                    {% if object.is_sale%}
+                                        <p><s>
+                                            ${{object.price}}
+                                        </s>
+
+                                        ${{object.price | multiplie:0.6}}
+                                        </p>
+                                    {% else %}
+                                        <p>
+                                            ${{ object.price }}
+                                        </p>
+                                        
+                                    {% endif %}
                                 </div>
                             </div>
                             <!-- Product actions-->
