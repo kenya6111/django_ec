@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary_storage',
+    'cloudinary',
 ]
 
 MIDDLEWARE = [
@@ -133,8 +135,14 @@ MEDIA_URL = 'medi/'# urlと画像のファイルを結びつける
 # でアクセスできるようになる。
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # try:
 #     from .local_settings import *
 # except ImportError:
 #     pass
+CLOUDINARY_STORAGE  = {
+    'CLOUD_NAME':'hpxbnsm38',
+    'API_KEY':'413388172719177',
+    'API_SECRET':'MA42WcHKeBQGEptKhIASWXyixJs'
+}
