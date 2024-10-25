@@ -43,7 +43,7 @@
                             <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Sale</div>
                             {% endif %}
                             <!-- Product image-->
-                            <img class="card-img-top" src="{{ object.snsimage.url }}" alt="..." />
+                            <img class="card-img-top" src="{{ object.image.url }}" alt="..." />
                             <!-- Product details-->
                             <div class="card-body p-4">
                                 <div class="text-center">
@@ -61,7 +61,6 @@
                                         <p>
                                             ${{ object.price }}
                                         </p>
-                                        
                                     {% endif %}
                                 </div>
                             </div>
@@ -83,5 +82,4 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Core theme JS-->
         <!-- <script src="js/scripts.js"></script> -->
-    </body>
 {% endblock %}
