@@ -1,11 +1,11 @@
 from django.db import models
 
 # Create your models here.
-class ItemModel(models.Model):
+class items(models.Model):
     name = models.CharField(max_length=100)
     star = models.IntegerField(null=True, blank=True, default=1)
     price = models.IntegerField(null=True, blank=True, default=1)
-    snsimage = models.ImageField(upload_to='')
+    image = models.ImageField(upload_to='')
     is_sale = models.BooleanField(default=False)
     # content = models.TextField()
     # author = models.CharField(max_length=100)

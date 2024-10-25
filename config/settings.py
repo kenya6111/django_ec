@@ -143,6 +143,6 @@ DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 #     pass
 CLOUDINARY_STORAGE  = {
     'CLOUD_NAME':'hpxbnsm38',
-    'API_KEY':'413388172719177',
-    'API_SECRET':'MA42WcHKeBQGEptKhIASWXyixJs'
+    'API_KEY':env("API_KEY"),
+    'API_SECRET':env("API_SECRET")
 }
