@@ -7,6 +7,7 @@ class items(models.Model):
     price = models.IntegerField(null=True, blank=True, default=1)
     image = models.ImageField(upload_to='')
     is_sale = models.BooleanField(default=False)
+    update = models.DateField(),
     # content = models.TextField()
     # author = models.CharField(max_length=100)
     # readText = models.TextField(null=True, blank=True, default='a')
