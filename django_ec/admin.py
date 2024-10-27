@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from django_ec.models import items
+from django_ec.models import ItemModel
 
 # Register your models here.
-admin.site.register(items)
+admin.site.register(ItemModel)
