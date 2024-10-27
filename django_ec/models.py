@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.db import models
 
 # Create your models here.
@@ -7,7 +8,8 @@ class items(models.Model):
     price = models.IntegerField(null=True, blank=True, default=1)
     image = models.ImageField(upload_to='')
     is_sale = models.BooleanField(default=False)
-    update = models.DateField(),
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     # content = models.TextField()
     # author = models.CharField(max_length=100)
     # readText = models.TextField(null=True, blank=True, default='a')

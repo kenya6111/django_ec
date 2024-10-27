@@ -17,6 +17,10 @@ def listfunc(request):
 
 def detailfunc(request, pk):
     object = get_object_or_404(items, pk=pk)
+    print(object.created_at)
+    print(object.pk)
 
-    object_list = items.objects.order_by('first_name')
-    return render(request, 'django_ec/detail.html', {'object':object})
+    object_list = items.objects.order_by('created_at').reverse()[:4]
+
+    print(object_list)
+    return render(request, 'django_ec/detail.html', {'object':object,'object_list':object_list})
