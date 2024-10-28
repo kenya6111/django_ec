@@ -35,12 +35,15 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'django_ec.apps.DjangoEcConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary_storage',
+    'cloudinary',
 ]
 
 MIDDLEWARE = [
@@ -121,10 +124,25 @@ STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+# アップロードファイルなどを読み込む際のフォルダの場所を記述
+MEDIA_ROOT = BASE_DIR / 'media'# メディアファイルをほぞんす流場所を指定する
+
+# サービス内でmediaフォルダのURLパスを設定
+MEDIA_URL = 'medi/'# urlと画像のファイルを結びつける
+# 静的ファイル（img,video）配信用のURLを指定する。
+# settings.pyにて以下のように設定すると
+# http(s)://ホスト名/medi/画像ファイル名
+# でアクセスできるようになる。
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # try:
 #     from .local_settings import *
 # except ImportError:
 #     pass
+CLOUDINARY_STORAGE  = {
+    'CLOUD_NAME':'hpxbnsm38',
+    'API_KEY':env("API_KEY"),
+    'API_SECRET':env("API_SECRET")
+}
