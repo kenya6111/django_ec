@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, render
 from config.settings import BASE_DIR
 from django_ec.models import ItemModel
 import environ
-from .consts import Menu
+from .constants.consts import Menu
 
 # Create your views here.
 
