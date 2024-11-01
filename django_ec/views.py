@@ -34,7 +34,8 @@ def adminmenufunc(request):
     return render(request, 'django_ec/admin/menu.html', {'menu_list':menu_list})
 
 def adminlistfunc(request):
-    return render(request, 'django_ec/admin/list.html', {})
+    object_list = ItemModel.objects.all()
+    return render(request, 'django_ec/admin/list.html', {'object_list':object_list})
 def admincreatefunc(request):
     return render(request, 'django_ec/admin/create.html', {})
 def admineditfunc(request):

@@ -1,5 +1,146 @@
 {% extends 'base.html' %}
 {% load app_tag %}
 {% block content %}
-list
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container px-4 px-lg-5">
+        <a class="navbar-brand" href="#!">AI Artifacts</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="#!">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+
+    <!-- DataTales Example -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">商品検索</h6>
+        </div>
+        <div class="card-body container">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 ">
+                    <div class="x_panel">
+                        <div class="x_content">
+                            <br />
+                            <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">
+
+                                <div class="item form-group d-flex mb-2">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="first-name"> 商品名</label>
+                                    <div class="col-md-6 col-sm-6 ">
+                                        <input type="text" id="first-name" required="required" class="form-control ">
+                                    </div>
+                                </div>
+                                <div class="item form-group d-flex mb-2">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="last-name">星</label>
+                                    <div class="col-md-6 col-sm-6 ">
+                                        <input type="text" id="last-name" name="last-name" required="required" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="item form-group d-flex mb-2">
+                                    <label for="middle-name" class="col-form-label col-md-3 col-sm-3 label-align">値段</label>
+                                    <div class="col-md-6 col-sm-6 ">
+                                        <input id="middle-name" class="form-control" type="text" name="middle-name">
+                                    </div>
+                                </div>
+                                <div class="item form-group d-flex mb-2">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align">割引</label>
+                                    <div class="col-md-6 col-sm-6 ">
+                                        <div id="gender" class="btn-group" data-toggle="buttons">
+                                            <label class="btn btn-secondary" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
+                                                <input type="radio" name="gender" value="male" class="join-btn"> &nbsp; 有り &nbsp;
+                                            </label>
+                                            <label class="btn btn-primary" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
+                                                <input type="radio" name="gender" value="female" class="join-btn"> 無し
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item form-group d-flex mb-2">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align">作成日時
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 ">
+                                        <input id="birthday" class="date-picker form-control" placeholder="dd-mm-yyyy" type="text" required="required" type="text" onfocus="this.type='date'" onmouseover="this.type='date'" onclick="this.type='date'" onblur="this.type='text'" onmouseout="timeFunctionLong(this)">
+                                        <script>
+                                            function timeFunctionLong(input) {
+                                                setTimeout(function() {
+                                                    input.type = 'text';
+                                                }, 60000);
+                                            }
+                                        </script>
+                                    </div>
+                                </div>
+                                <div class="ln_solid"></div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-grid gap-2 d-md-block text-center mb-2">
+            <button class="btn btn-primary" type="button">検索</button>
+        </div>
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">商品一覧</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>商品名</th>
+                            <th>星</th>
+                            <th>値段</th>
+                            <th>割引</th>
+                            <th>作成日時</th>
+                            <th>更新日時</th>
+                            <th>編集</th>
+                            <th>削除</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for object in object_list %}
+                        <tr>
+                            <td>{{ object.name }}</td>
+                            <td>{{ object.star }}</td>
+                            <td>{{ object.price }}</td>
+                            <td>{{ object.is_sale }}</td>
+                            <td>{{ object.created_at|date:"Y-m-j H:i:s" }}</td>
+                            <td>{{ object.updated_at|date:"Y-m-j H:i:s" }}</td>
+                            <td>
+                                <div class="d-grid gap-2 d-md-block">
+                                    <button class="btn btn-primary" type="button">編集</button>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-grid gap-2 d-md-block">
+                                    <button class="btn btn-primary" type="button">削除</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+<style>
+/* .form-group {
+  display: flex;
+  align-items: center;
+} */
+
+
+
+</style>
 {% endblock %}
