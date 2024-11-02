@@ -26,3 +26,4 @@ urllib3==2.2.3
 wheel==0.37.0
 whitenoise==6.7.0
 six==1.16.0
+wsgi-basic-auth==1.1.0

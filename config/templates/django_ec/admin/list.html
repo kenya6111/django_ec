@@ -146,12 +146,12 @@
                             <td>{{ object.created_at|date:"Y-m-j H:i:s" }}</td>
                             <td>{{ object.updated_at|date:"Y-m-j H:i:s" }}</td>
                             <td>
-                                <div class="d-grid gap-2 d-md-block">
+                                <div class="d-grid gap-2 d-md-block text-center">
                                     <a class="btn btn-primary" role="button" href="{% url 'edit' object.pk %}">編集</a>
                                 </div>
                             </td>
                             <td>
-                                <div class="d-grid gap-2 d-md-block">
+                                <div class="d-grid gap-2 d-md-block text-center">
                                     <a class="btn btn-danger" role="button" href="{% url 'delete' object.pk %}">削除</a>
                                 </div>
                             </td>

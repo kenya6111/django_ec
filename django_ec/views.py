@@ -55,12 +55,6 @@ def adminlistfunc(request):
 
         object_list = ItemModel.objects.all()
 
-        # print(product_name)
-        # print(type(product_name))
-        print(type(create_date_from))
-        print(create_date_from)
-        print(type(create_date_to))
-        print(create_date_to)
         if product_name is not None and len(product_name) != 0:
             object_list = object_list.filter(name__contains=product_name)
         if star_from is not None and len(star_from) != 0:
@@ -81,17 +75,9 @@ def adminlistfunc(request):
             object_list = object_list.filter(created_at__gte=create_date_from)
         if create_date_to is not None and len(create_date_to) != 0:
             object_list = object_list.filter(created_at__lte=create_date_to)
-        
 
         return render(request, 'django_ec/admin/list.html', {'object_list':object_list, 'error_list':error_list})
-        # user = authenticate(request, username=username, password=password)
-        # if user is not None:
-        #     login(request, user)
-        #     return render(request, 'login.html', {'context':'logged in !!'})
-        # else:
-        #     return render(request, 'login.html', {'context':' not logged in !!'})
 
-    # return render(request, 'login.html', {'context':'get method '})
     return render(request, 'django_ec/admin/list.html', {})
 def admincreatefunc(request):
     return render(request, 'django_ec/admin/create.html', {})
