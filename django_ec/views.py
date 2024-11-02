@@ -47,7 +47,7 @@ def adminlistfunc(request):
 
         object_list = ItemModel.objects.all()
 
-        error_list=[]
+        error_list=[] 
         validate(error_list, star_from, star_to)
 
         if product_name is not None:
