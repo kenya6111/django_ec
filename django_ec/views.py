@@ -40,26 +40,48 @@ def adminlistfunc(request):
         product_name = request.POST.get("product-name")
         star_from = request.POST.get("star_from")
         star_to = request.POST.get("star_to")
-        price = request.POST.get("price")
+        price_from = request.POST.get("price_from")
+        price_to = request.POST.get("price_to")
         is_sale = request.POST.get("is-sale")
+        is_not_sale = request.POST.get("is-not-sale")
         create_date_from = request.POST.get("create-date-from")
         create_date_to = request.POST.get("create-date-to")
 
+        # 検索条件の入力値チェック
+        error_list=[]
+        result = validate(error_list, star_from, star_to, price_from, price_to, create_date_from, create_date_to)
+        if(result == 0):
+            return render(request, 'django_ec/admin/list.html', {'error_list':error_list})
+
         object_list = ItemModel.objects.all()
 
-        error_list=[] 
-        validate(error_list, star_from, star_to)
-
-        if product_name is not None:
+        # print(product_name)
+        # print(type(product_name))
+        print(type(create_date_from))
+        print(create_date_from)
+        print(type(create_date_to))
+        print(create_date_to)
+        if product_name is not None and len(product_name) != 0:
             object_list = object_list.filter(name__contains=product_name)
+        if star_from is not None and len(star_from) != 0:
+            object_list = object_list.filter(star__gte=star_from)
+        if star_to is not None and len(star_to) != 0:
+            object_list = object_list.filter(star__lte=star_to)
+        if price_from is not None and len(price_from) != 0:
+            object_list = object_list.filter(price__gte=price_from)
+        if price_to is not None and len(price_to) != 0:
+            object_list = object_list.filter(price__lte=price_to)
+        if is_sale is not None and is_not_sale is not None:
+            print("")
+        elif is_sale is not None:
+            object_list = object_list.filter(is_sale=1)
+        elif is_not_sale is not None:
+            object_list = object_list.filter(is_sale=0)
+        if create_date_from is not None and len(create_date_from) != 0:
+            object_list = object_list.filter(created_at__gte=create_date_from)
+        if create_date_to is not None and len(create_date_to) != 0:
+            object_list = object_list.filter(created_at__lte=create_date_to)
         
-        # if star is not None:
-        #     star = object_list.filter(name=star)
-        # if price is not None:
-        #     object_list = object_list.filter(name=price)
-        # if product_name is not None:
-        #     object_list = object_list.filter(name=product_name)
-
 
         return render(request, 'django_ec/admin/list.html', {'object_list':object_list, 'error_list':error_list})
         # user = authenticate(request, username=username, password=password)
@@ -109,7 +131,20 @@ class ItemDelete (DeleteView):
     success_url = reverse_lazy('list')
 
 
-def validate(error_list, star_from, star_to):
-    if star_from is not None and star_to is not None:
+def validate(error_list, star_from, star_to, price_from, price_to, create_date_from, create_date_to):
+    if len(star_from) !=0 and len(star_to) != 0:
         if star_from >= star_to:
-            return error_list.append("星数の開始数は終了数より小さい値を設定してください")
+            error_list.append("星数の開始数は終了数より小さい値を設定してください")
+            return False
+
+    if len(price_from) !=0 and len(price_to) != 0:
+        if price_from >= price_to:
+            error_list.append("値段の開始数は終了数より小さい値を設定してください")
+            return False
+
+    if len(create_date_from) !=0 and len(create_date_to) != 0:
+        if create_date_from >= create_date_to:
+            error_list.append("作成日の開始日は終了日より小さい値を設定してください")
+            return False
+    
+    return True

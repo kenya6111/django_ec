@@ -26,7 +26,9 @@
             <div class="card-body container">
                 {% if error_list is not None%}
                     {% for error in error_list %}
-                        <p>{{ error }}</p>
+                        <div class="alert alert-danger" role="alert">
+                            {{ error }}
+                        </div>
                     {% endfor %}
                 {% endif %}
                 <div class="row">
@@ -38,41 +40,43 @@
                                 <div class="item form-group d-flex mb-2">
                                     <label class="col-form-label col-md-3 col-sm-3 label-align" for="first-name"> 商品名</label>
                                     <div class="col-md-6 col-sm-6 ">
-                                        <input type="text" id="first-name" class="form-control" name="product-name">
+                                        <input type="text" id="first-name" class="form-control" name="product-name" placeholder="">
                                     </div>
                                 </div>
                                 <div class="item form-group d-flex mb-2">
                                     <label class="col-form-label col-md-3 col-sm-3 label-align" for="last-name">星数</label>
                                     <div class="col-md-2 col-sm-6 ">
-                                        <input type="number" id="last-name" name="star_from" class="form-control" min="1" max="5">
+                                        <input type="number" id="last-name" name="star_from" class="form-control" placeholder="0" min="1" max="5">
                                     </div>
                                     <div class="ms-2 me-2 "><span class="align-middle">~</span></div>
                                     <div class="col-md-2 col-sm-6 ">
-                                        <input type="number" id="last-name2" name="star_to" class="form-control" min="1" max="5">
+                                        <input type="number" id="last-name2" name="star_to" class="form-control" placeholder="5" min="1" max="5">
                                     </div>
                                 </div>
                                 <div class="item form-group d-flex mb-2">
                                     <label for="middle-name" class="col-form-label col-md-3 col-sm-3 label-align">値段</label>
                                     <div class="col-md-2 col-sm-6 ">
-                                        <input id="middle-name" class="form-control" type="number" name="price">
+                                        <input id="middle-name" class="form-control" type="number" name="price_from" placeholder="1000">
                                     </div>
                                     <div class="ms-2 me-2 "><span class="align-middle">~</span></div>
                                     <div class="col-md-2 col-sm-6 ">
-                                        <input id="middle-name" class="form-control" type="number" name="price">
+                                        <input id="middle-name2" class="form-control" type="number" name="price_to" placeholder="2000">
                                     </div>
                                 </div>
                                 <div class="item form-group d-flex mb-2">
                                     <label class="col-form-label col-md-3 col-sm-3 label-align">割引</label>
-                                    <div class="col-md-6 col-sm-6 ">
-                                        <!-- <div id="gender" class="btn-group" data-toggle="buttons">
-                                            <label class="btn" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
-                                                <input type="radio" name="is-sale" value="male" class="join-btn"> &nbsp; 有り &nbsp;
-                                            </label>
-                                        </div> -->
+                                    <div class="col-md-6 col-sm-6 d-flex">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+                                            <input class="form-check-input" type="checkbox" name="is-sale" value="" id="flexCheckChecked" checked>
                                             <label class="form-check-label" for="flexCheckChecked">
                                                 有り
+                                            </label>
+                                        </div>
+                                        <div class="ms-2 me-2 "><span class="align-middle"> </span></div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="is-not-sale" value="" id="flexCheckChecked2" checked>
+                                            <label class="form-check-label" for="flexCheckChecked2">
+                                                無し
                                             </label>
                                         </div>
                                     </div>
@@ -81,7 +85,7 @@
                                     <label class="col-form-label col-md-3 col-sm-3 label-align">作成日
                                     </label>
                                     <div class="col-md-2 col-sm-6 ">
-                                        <input id="birthday1" name="create-date-from" class="date-picker form-control" placeholder="dd-mm-yyyy" type="text" type="text" onfocus="this.type='date'" onmouseover="this.type='date'" onclick="this.type='date'" onblur="this.type='text'" onmouseout="timeFunctionLong(this)">
+                                        <input id="birthday1" name="create-date-from" class="date-picker form-control" placeholder="年/月/日" type="text" type="text" onfocus="this.type='date'" onmouseover="this.type='date'" onclick="this.type='date'" onblur="this.type='text'" onmouseout="timeFunctionLong(this)">
                                         <script>
                                             function timeFunctionLong(input) {
                                                 setTimeout(function() {
@@ -92,7 +96,7 @@
                                     </div>
                                     <div class="ms-2 me-2 "><span class="align-middle">~</span></div>
                                     <div class="col-md-2 col-sm-6 ">
-                                        <input id="birthday2" name="create-date-to" class="date-picker form-control" placeholder="dd-mm-yyyy" type="text" type="text" onfocus="this.type='date'" onmouseover="this.type='date'" onclick="this.type='date'" onblur="this.type='text'" onmouseout="timeFunctionLong(this)">
+                                        <input id="birthday2" name="create-date-to" class="date-picker form-control" placeholder="年/月/日" type="text" type="text" onfocus="this.type='date'" onmouseover="this.type='date'" onclick="this.type='date'" onblur="this.type='text'" onmouseout="timeFunctionLong(this)">
                                         <script>
                                             function timeFunctionLong(input) {
                                                 setTimeout(function() {
