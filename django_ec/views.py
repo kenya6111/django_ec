@@ -6,7 +6,7 @@ import environ
 from .constants.consts import Menu
 from django.views.generic import CreateView,UpdateView,DeleteView
 from django.urls import reverse_lazy
-
+from .basic_auth_view import logged_in_or_basicauth
 # Create your views here.
 
 def index(request):
@@ -26,7 +26,7 @@ def detailfunc(request, pk):
     print(object_list)
     return render(request, 'django_ec/detail.html', {'object':object,'object_list':object_list})
 
-
+@logged_in_or_basicauth()
 def adminmenufunc(request):
     menu_list = list(Menu)
     print(menu_list)
@@ -35,6 +35,7 @@ def adminmenufunc(request):
         print(ob.id)
     return render(request, 'django_ec/admin/menu.html', {'menu_list':menu_list})
 
+@logged_in_or_basicauth()
 def adminlistfunc(request):
     if request.method == 'POST':
         product_name = request.POST.get("product-name")
@@ -79,8 +80,12 @@ def adminlistfunc(request):
         return render(request, 'django_ec/admin/list.html', {'object_list':object_list, 'error_list':error_list})
 
     return render(request, 'django_ec/admin/list.html', {})
+
+@logged_in_or_basicauth()
 def admincreatefunc(request):
     return render(request, 'django_ec/admin/create.html', {})
+
+@logged_in_or_basicauth()
 def admineditfunc(request,pk):
     if request.method == 'POST':
 
@@ -92,8 +97,11 @@ def admineditfunc(request,pk):
         return render(request, 'django_ec/admin/edit.html', {'object':object})
 
     return render(request, 'django_ec/admin/edit.html', {'object':object})
+
+@logged_in_or_basicauth()
 def admindeletefunc(request):
     return render(request, 'django_ec/admin/delete.html', {})
+
 
 class ItemCreate(CreateView):
     template_name = 'django_ec/admin/create.html'
