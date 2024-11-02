@@ -22,50 +22,66 @@
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">商品検索</h6>
         </div>
-        <div class="card-body container">
-            <div class="row">
+        <form method="post" action="list" id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">{% csrf_token %}
+            <div class="card-body container">
+                {% if error_list is not None%}
+                    {% for error in error_list %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+                <div class="row">
                 <div class="col-md-12 col-sm-12 ">
                     <div class="x_panel">
                         <div class="x_content">
-                            <br />
-                            <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">
+                            <br/>
 
                                 <div class="item form-group d-flex mb-2">
                                     <label class="col-form-label col-md-3 col-sm-3 label-align" for="first-name"> 商品名</label>
                                     <div class="col-md-6 col-sm-6 ">
-                                        <input type="text" id="first-name" required="required" class="form-control ">
+                                        <input type="text" id="first-name" class="form-control" name="product-name">
                                     </div>
                                 </div>
                                 <div class="item form-group d-flex mb-2">
-                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="last-name">星</label>
-                                    <div class="col-md-6 col-sm-6 ">
-                                        <input type="text" id="last-name" name="last-name" required="required" class="form-control">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="last-name">星数</label>
+                                    <div class="col-md-2 col-sm-6 ">
+                                        <input type="number" id="last-name" name="star_from" class="form-control" min="1" max="5">
+                                    </div>
+                                    <div class="ms-2 me-2 "><span class="align-middle">~</span></div>
+                                    <div class="col-md-2 col-sm-6 ">
+                                        <input type="number" id="last-name2" name="star_to" class="form-control" min="1" max="5">
                                     </div>
                                 </div>
                                 <div class="item form-group d-flex mb-2">
                                     <label for="middle-name" class="col-form-label col-md-3 col-sm-3 label-align">値段</label>
-                                    <div class="col-md-6 col-sm-6 ">
-                                        <input id="middle-name" class="form-control" type="text" name="middle-name">
+                                    <div class="col-md-2 col-sm-6 ">
+                                        <input id="middle-name" class="form-control" type="number" name="price">
+                                    </div>
+                                    <div class="ms-2 me-2 "><span class="align-middle">~</span></div>
+                                    <div class="col-md-2 col-sm-6 ">
+                                        <input id="middle-name" class="form-control" type="number" name="price">
                                     </div>
                                 </div>
                                 <div class="item form-group d-flex mb-2">
                                     <label class="col-form-label col-md-3 col-sm-3 label-align">割引</label>
                                     <div class="col-md-6 col-sm-6 ">
-                                        <div id="gender" class="btn-group" data-toggle="buttons">
-                                            <label class="btn btn-secondary" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
-                                                <input type="radio" name="gender" value="male" class="join-btn"> &nbsp; 有り &nbsp;
+                                        <!-- <div id="gender" class="btn-group" data-toggle="buttons">
+                                            <label class="btn" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
+                                                <input type="radio" name="is-sale" value="male" class="join-btn"> &nbsp; 有り &nbsp;
                                             </label>
-                                            <label class="btn btn-primary" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
-                                                <input type="radio" name="gender" value="female" class="join-btn"> 無し
+                                        </div> -->
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+                                            <label class="form-check-label" for="flexCheckChecked">
+                                                有り
                                             </label>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="item form-group d-flex mb-2">
-                                    <label class="col-form-label col-md-3 col-sm-3 label-align">作成日時
+                                <div class="item form-group d-flex mb-2 ">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align">作成日
                                     </label>
-                                    <div class="col-md-6 col-sm-6 ">
-                                        <input id="birthday" class="date-picker form-control" placeholder="dd-mm-yyyy" type="text" required="required" type="text" onfocus="this.type='date'" onmouseover="this.type='date'" onclick="this.type='date'" onblur="this.type='text'" onmouseout="timeFunctionLong(this)">
+                                    <div class="col-md-2 col-sm-6 ">
+                                        <input id="birthday1" name="create-date-from" class="date-picker form-control" placeholder="dd-mm-yyyy" type="text" type="text" onfocus="this.type='date'" onmouseover="this.type='date'" onclick="this.type='date'" onblur="this.type='text'" onmouseout="timeFunctionLong(this)">
                                         <script>
                                             function timeFunctionLong(input) {
                                                 setTimeout(function() {
@@ -74,23 +90,34 @@
                                             }
                                         </script>
                                     </div>
-                                </div>
+                                    <div class="ms-2 me-2 "><span class="align-middle">~</span></div>
+                                    <div class="col-md-2 col-sm-6 ">
+                                        <input id="birthday2" name="create-date-to" class="date-picker form-control" placeholder="dd-mm-yyyy" type="text" type="text" onfocus="this.type='date'" onmouseover="this.type='date'" onclick="this.type='date'" onblur="this.type='text'" onmouseout="timeFunctionLong(this)">
+                                        <script>
+                                            function timeFunctionLong(input) {
+                                                setTimeout(function() {
+                                                    input.type = 'text';
+                                                }, 60000);
+                                            }
+                                        </script>
+                                    </div>
+                                  </div>
                                 <div class="ln_solid"></div>
 
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+            <div class="d-grid gap-2 d-md-block text-center mb-2">
+                <button class="btn btn-primary" type="submit">検索</button>
+            </div>
+        </form>
 
-        <div class="d-grid gap-2 d-md-block text-center mb-2">
-            <button class="btn btn-primary" type="button">検索</button>
-        </div>
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">商品一覧</h6>
         </div>
-        <div class="card-body">
+        <div class="card-body container">
             <div class="table-responsive">
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
@@ -116,12 +143,12 @@
                             <td>{{ object.updated_at|date:"Y-m-j H:i:s" }}</td>
                             <td>
                                 <div class="d-grid gap-2 d-md-block">
-                                    <button class="btn btn-primary" type="button">編集</button>
+                                    <a class="btn btn-primary" role="button" href="{% url 'edit' object.pk %}">編集</a>
                                 </div>
                             </td>
                             <td>
                                 <div class="d-grid gap-2 d-md-block">
-                                    <button class="btn btn-primary" type="button">削除</button>
+                                    <a class="btn btn-danger" role="button" href="{% url 'delete' object.pk %}">削除</a>
                                 </div>
                             </td>
                         </tr>
@@ -130,6 +157,10 @@
                 </table>
 
             </div>
+        </div>
+        <div class="d-grid gap-4 d-md-block text-center mb-2">
+            <a href="{% url 'menu' %}" class="btn btn-secondary " role="button" >戻る</a>
+            <a href="{% url 'create' %}" class="btn btn-success " role="button" >新規作成</a>
         </div>
     </div>
 
