@@ -82,23 +82,6 @@ def adminlistfunc(request):
     return render(request, 'django_ec/admin/list.html', {})
 
 @logged_in_or_basicauth()
-def admincreatefunc(request):
-    return render(request, 'django_ec/admin/create.html', {})
-
-@logged_in_or_basicauth()
-def admineditfunc(request,pk):
-    if request.method == 'POST':
-
-        return render(request, 'django_ec/admin/list.html', {'object':object})
-
-    else:
-        # GETの場合
-        object = get_object_or_404(ItemModel, pk=pk)
-        return render(request, 'django_ec/admin/edit.html', {'object':object})
-
-    return render(request, 'django_ec/admin/edit.html', {'object':object})
-
-@logged_in_or_basicauth()
 def admindeletefunc(request):
     return render(request, 'django_ec/admin/delete.html', {})
 
