@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.urls import path
 from django.views.generic.base import TemplateView
 from . import views
-from .views import listfunc, detailfunc, adminmenufunc,adminlistfunc,admincreatefunc,admineditfunc,admindeletefunc,ItemCreate,ItemEdit,ItemDelete
+from .views import listfunc, detailfunc, adminmenufunc,adminlistfunc,admincreatefunc,admineditfunc,admindeletefunc,ItemCreate,ItemEdit,ItemDelete,cartdetailfunc,addcartfunc,removefromcartfunc
 
 urlpatterns = [
     path("", views.index, name="index"),
@@ -14,4 +14,7 @@ urlpatterns = [
     path('admin/create', ItemCreate.as_view(), name="create"),
     path("admin/edit/<int:pk>", ItemEdit.as_view(), name="edit"),
     path("admin/delete/<int:pk>", ItemDelete.as_view(), name="delete"),
+    path("cartdetail/", views.cartdetailfunc, name="cartdetail"),
+    path("addtocart/<int:pk>", views.addcartfunc, name="addtocart"),
+    path("removefromcart/", views.removefromcartfunc, name="removefromcart"),
 ]

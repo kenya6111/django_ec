@@ -14,7 +14,13 @@ def index(request):
 
 def listfunc(request):
     object_list = ItemModel.objects.all()
-    return render(request, 'django_ec/list.html',{"object_list":object_list})
+
+    cart = request.session.get('cart', {})
+    item_num_sum = 0
+    for v in cart.values():
+        item_num_sum += v
+
+    return render(request, 'django_ec/list.html',{"object_list":object_list, 'item_num_sum':item_num_sum})
 
 def detailfunc(request, pk):
     object = get_object_or_404(ItemModel, pk=pk)
@@ -82,23 +88,6 @@ def adminlistfunc(request):
     return render(request, 'django_ec/admin/list.html', {})
 
 @logged_in_or_basicauth()
-def admincreatefunc(request):
-    return render(request, 'django_ec/admin/create.html', {})
-
-@logged_in_or_basicauth()
-def admineditfunc(request,pk):
-    if request.method == 'POST':
-
-        return render(request, 'django_ec/admin/list.html', {'object':object})
-
-    else:
-        # GETの場合
-        object = get_object_or_404(ItemModel, pk=pk)
-        return render(request, 'django_ec/admin/edit.html', {'object':object})
-
-    return render(request, 'django_ec/admin/edit.html', {'object':object})
-
-@logged_in_or_basicauth()
 def admindeletefunc(request):
     return render(request, 'django_ec/admin/delete.html', {})
 
@@ -124,6 +113,60 @@ class ItemDelete (DeleteView):
     model = ItemModel
     success_url = reverse_lazy('list')
 
+def cartdetailfunc(request):
+
+    # sessionからカート内情報取得
+    cart = request.session.get('cart', {})
+    id_list = cart.keys()
+
+
+    object_list = ItemModel.objects.filter(pk__in=id_list)
+    print(object_list)
+
+    # 注文数合計取得
+    item_num_sum = 0
+    for v in cart.values():
+        item_num_sum += v
+
+    # 注文総額を算出
+    item_price_sum = 0
+    for k, v in cart.items():
+        object = ItemModel.objects.get(id = k)
+        if object.is_sale:
+            item_price_sum += object.price * 0.6 * v
+        else:
+            item_price_sum += object.price * v
+
+    return render(request, 'django_ec/cart.html', {'object_list':object_list, 'item_num_sum':item_num_sum, 'item_price_sum':round(item_price_sum)})
+
+def addcartfunc(request,pk):
+    cart = request.session.get('cart', {})
+
+    # 追加個数分を加算
+    if pk in cart:
+        item_num = cart.get(pk)
+        item_num+=1
+        cart[pk]=item_num
+    else:
+        cart[pk] = 1
+
+    # sesionに保存
+    request.session['cart'] = cart
+
+    # カート内の商品数を算出
+    item_num_sum = 0
+    for v in cart.values():
+        item_num_sum += v
+    print(cart)
+    object_list = ItemModel.objects.all()
+    return render(request, 'django_ec/list.html', {'object_list':object_list, 'item_num_sum':item_num_sum})
+
+
+def removefromcartfunc(request):
+    # cart = request.session.get('cart', {})
+    request.session["cart"] = {}
+    object_list = ItemModel.objects.all()
+    return render(request, 'django_ec/list.html', {'object_list':object_list})
 
 def validate(error_list, star_from, star_to, price_from, price_to, create_date_from, create_date_to):
     if len(star_from) !=0 and len(star_to) != 0:

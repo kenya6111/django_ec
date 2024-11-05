@@ -27,7 +27,7 @@ environ.Env.read_env(env_file=str(BASE_DIR) + "/.env")
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -56,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 
 ROOT_URLCONF = 'config.urls'
 
@@ -122,6 +123,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [str(BASE_DIR /  'static')]
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 # アップロードファイルなどを読み込む際のフォルダの場所を記述
