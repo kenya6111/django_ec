@@ -55,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'basicauth.middleware.BasicAuthMiddleware',
 ]
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 
@@ -148,3 +149,6 @@ CLOUDINARY_STORAGE  = {
     'API_KEY':env("API_KEY"),
     'API_SECRET':env("API_SECRET")
 }
+
+
+BASICAUTH_USERS = {"admin": "pw"}

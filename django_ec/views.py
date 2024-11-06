@@ -6,7 +6,8 @@ import environ
 from .constants.consts import Menu
 from django.views.generic import CreateView,UpdateView,DeleteView, ListView
 from django.urls import reverse_lazy
-from .basic_auth_view import logged_in_or_basicauth
+from basicauth.decorators import basic_auth_required
+from django.utils.decorators import method_decorator
 # Create your views here.
 
 def index(request):
@@ -32,7 +33,7 @@ def detailfunc(request, pk):
     print(object_list)
     return render(request, 'django_ec/detail.html', {'object':object,'object_list':object_list})
 
-@logged_in_or_basicauth()
+@basic_auth_required
 def adminmenufunc(request):
     menu_list = list(Menu)
     print(menu_list)
@@ -40,7 +41,7 @@ def adminmenufunc(request):
         print(ob.name)
         print(ob.id)
     return render(request, 'django_ec/admin/menu.html', {'menu_list':menu_list})
-
+@method_decorator(basic_auth_required, name='dispatch')
 class ItemList(ListView):
 
     template_name = 'django_ec/admin/list.html'
@@ -59,11 +60,11 @@ class ItemList(ListView):
         }
         return ItemModel.objects.search(**params)
 
-@logged_in_or_basicauth()
+
 def admindeletefunc(request):
     return render(request, 'django_ec/admin/delete.html', {})
 
-
+@method_decorator(basic_auth_required, name='dispatch')
 class ItemCreate(CreateView):
     template_name = 'django_ec/admin/create.html'
     model = ItemModel
@@ -73,13 +74,13 @@ class ItemCreate(CreateView):
     def form_invalid(self, form):
         print(form.errors)  # デバッグ用にエラー内容を出力
         return super().form_invalid(form)
-
+@method_decorator(basic_auth_required, name='dispatch')
 class ItemEdit(UpdateView):
     template_name = 'django_ec/admin/edit.html'
     model = ItemModel
     fields = ('name','star','image','price','is_sale')
     success_url = reverse_lazy('list')
-
+@method_decorator(basic_auth_required, name='dispatch')
 class ItemDelete (DeleteView):
     template_name = 'django_ec/admin/delete.html'
     model = ItemModel
