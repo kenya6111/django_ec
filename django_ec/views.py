@@ -4,7 +4,7 @@ from config.settings import BASE_DIR
 from django_ec.models import ItemModel
 import environ
 from .constants.consts import Menu
-from django.views.generic import CreateView,UpdateView,DeleteView
+from django.views.generic import CreateView,UpdateView,DeleteView, ListView
 from django.urls import reverse_lazy
 from .basic_auth_view import logged_in_or_basicauth
 # Create your views here.
@@ -35,51 +35,23 @@ def adminmenufunc(request):
         print(ob.id)
     return render(request, 'django_ec/admin/menu.html', {'menu_list':menu_list})
 
-@logged_in_or_basicauth()
-def adminlistfunc(request):
-    if request.method == 'POST':
-        product_name = request.POST.get("product-name")
-        star_from = request.POST.get("star_from")
-        star_to = request.POST.get("star_to")
-        price_from = request.POST.get("price_from")
-        price_to = request.POST.get("price_to")
-        is_sale = request.POST.get("is-sale")
-        is_not_sale = request.POST.get("is-not-sale")
-        create_date_from = request.POST.get("create-date-from")
-        create_date_to = request.POST.get("create-date-to")
+class ItemList(ListView):
 
-        # 検索条件の入力値チェック
-        error_list=[]
-        result = validate(error_list, star_from, star_to, price_from, price_to, create_date_from, create_date_to)
-        if(result == 0):
-            return render(request, 'django_ec/admin/list.html', {'error_list':error_list})
-
-        object_list = ItemModel.objects.all()
-
-        if product_name is not None and len(product_name) != 0:
-            object_list = object_list.filter(name__contains=product_name)
-        if star_from is not None and len(star_from) != 0:
-            object_list = object_list.filter(star__gte=star_from)
-        if star_to is not None and len(star_to) != 0:
-            object_list = object_list.filter(star__lte=star_to)
-        if price_from is not None and len(price_from) != 0:
-            object_list = object_list.filter(price__gte=price_from)
-        if price_to is not None and len(price_to) != 0:
-            object_list = object_list.filter(price__lte=price_to)
-        if is_sale is not None and is_not_sale is not None:
-            print("")
-        elif is_sale is not None:
-            object_list = object_list.filter(is_sale=1)
-        elif is_not_sale is not None:
-            object_list = object_list.filter(is_sale=0)
-        if create_date_from is not None and len(create_date_from) != 0:
-            object_list = object_list.filter(created_at__gte=create_date_from)
-        if create_date_to is not None and len(create_date_to) != 0:
-            object_list = object_list.filter(created_at__lte=create_date_to)
-
-        return render(request, 'django_ec/admin/list.html', {'object_list':object_list, 'error_list':error_list})
-
-    return render(request, 'django_ec/admin/list.html', {})
+    template_name = 'django_ec/admin/list.html'
+    model = ItemModel
+    def get_queryset(self):
+        params = {
+            "product_name": self.request.GET.get("product-name"),
+            "star_from": self.request.GET.get("star_from"),
+            "star_to": self.request.GET.get("star_to"),
+            "price_from": self.request.GET.get("price_from"),
+            "price_to": self.request.GET.get("price_to"),
+            "is_sale": self.request.GET.get("is-sale"),
+            "is_not_sale": self.request.GET.get("is-not-sale"),
+            "create_date_from": self.request.GET.get("create-date-from"),
+            "create_date_to": self.request.GET.get("create-date-to"),
+        }
+        return ItemModel.objects.search(**params)
 
 @logged_in_or_basicauth()
 def admindeletefunc(request):
