@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load app_tag %}
+{% block content %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container px-4 px-lg-5">
+        <a class="navbar-brand" href="#!">AI Artifacts</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="#!">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+
+    <!-- DataTales Example -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">商品検索</h6>
+        </div>
+        <form method="GET" action="list" id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">{% csrf_token %}
+            <div class="card-body container">
+                {% if error_list is not None%}
+                    {% for error in error_list %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                <div class="row">
+                <div class="col-md-12 col-sm-12 ">
+                    <div class="x_panel">
+                        <div class="x_content">
+                            <br/>
+
+                                <div class="item form-group d-flex mb-2">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="first-name"> 商品名</label>
+                                    <div class="col-md-6 col-sm-6 ">
+                                        <input type="text" id="first-name" class="form-control" name="product-name" placeholder="">
+                                    </div>
+                                </div>
+                                <div class="item form-group d-flex mb-2">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="last-name">星数</label>
+                                    <div class="col-md-2 col-sm-6 ">
+                                        <input type="number" id="last-name" name="star_from" class="form-control" placeholder="0" min="1" max="5">
+                                    </div>
+                                    <div class="ms-2 me-2 "><span class="align-middle">~</span></div>
+                                    <div class="col-md-2 col-sm-6 ">
+                                        <input type="number" id="last-name2" name="star_to" class="form-control" placeholder="5" min="1" max="5">
+                                    </div>
+                                </div>
+                                <div class="item form-group d-flex mb-2">
+                                    <label for="middle-name" class="col-form-label col-md-3 col-sm-3 label-align">値段</label>
+                                    <div class="col-md-2 col-sm-6 ">
+                                        <input id="middle-name" class="form-control" type="number" name="price_from" placeholder="1000">
+                                    </div>
+                                    <div class="ms-2 me-2 "><span class="align-middle">~</span></div>
+                                    <div class="col-md-2 col-sm-6 ">
+                                        <input id="middle-name2" class="form-control" type="number" name="price_to" placeholder="2000">
+                                    </div>
+                                </div>
+                                <div class="item form-group d-flex mb-2">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align">割引</label>
+                                    <div class="col-md-6 col-sm-6 d-flex">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="is-sale" value="" id="flexCheckChecked" checked>
+                                            <label class="form-check-label" for="flexCheckChecked">
+                                                有り
+                                            </label>
+                                        </div>
+                                        <div class="ms-2 me-2 "><span class="align-middle"> </span></div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="is-not-sale" value="" id="flexCheckChecked2" checked>
+                                            <label class="form-check-label" for="flexCheckChecked2">
+                                                無し
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item form-group d-flex mb-2 ">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align">作成日
+                                    </label>
+                                    <div class="col-md-2 col-sm-6 ">
+                                        <input id="birthday1" name="create-date-from" class="date-picker form-control" placeholder="年/月/日" type="text" type="text" onfocus="this.type='date'" onmouseover="this.type='date'" onclick="this.type='date'" onblur="this.type='text'" onmouseout="timeFunctionLong(this)">
+                                        <script>
+                                            function timeFunctionLong(input) {
+                                                setTimeout(function() {
+                                                    input.type = 'text';
+                                                }, 60000);
+                                            }
+                                        </script>
+                                    </div>
+                                    <div class="ms-2 me-2 "><span class="align-middle">~</span></div>
+                                    <div class="col-md-2 col-sm-6 ">
+                                        <input id="birthday2" name="create-date-to" class="date-picker form-control" placeholder="年/月/日" type="text" type="text" onfocus="this.type='date'" onmouseover="this.type='date'" onclick="this.type='date'" onblur="this.type='text'" onmouseout="timeFunctionLong(this)">
+                                        <script>
+                                            function timeFunctionLong(input) {
+                                                setTimeout(function() {
+                                                    input.type = 'text';
+                                                }, 60000);
+                                            }
+                                        </script>
+                                    </div>
+                                  </div>
+                                <div class="ln_solid"></div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-grid gap-2 d-md-block text-center mb-2">
+                <button class="btn btn-primary" type="submit">検索</button>
+            </div>
+        </form>
+
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">商品一覧</h6>
+        </div>
+        <div class="card-body container">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>商品名</th>
+                            <th>星</th>
+                            <th>値段</th>
+                            <th>割引</th>
+                            <th>作成日時</th>
+                            <th>更新日時</th>
+                            <th>編集</th>
+                            <th>削除</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for object in object_list %}
+                        <tr>
+                            <td>{{ object.name }}</td>
+                            <td>{{ object.star }}</td>
+                            <td>{{ object.price }}</td>
+                            <td>{{ object.is_sale }}</td>
+                            <td>{{ object.created_at|date:"Y-m-j H:i:s" }}</td>
+                            <td>{{ object.updated_at|date:"Y-m-j H:i:s" }}</td>
+                            <td>
+                                <div class="d-grid gap-2 d-md-block text-center">
+                                    <a class="btn btn-primary" role="button" href="{% url 'edit' object.pk %}">編集</a>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-grid gap-2 d-md-block text-center">
+                                    <a class="btn btn-danger" role="button" href="{% url 'delete' object.pk %}">削除</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+        <div class="d-grid gap-4 d-md-block text-center mb-2">
+            <a href="{% url 'menu' %}" class="btn btn-secondary " role="button" >戻る</a>
+            <a href="{% url 'create' %}" class="btn btn-success " role="button" >新規作成</a>
+        </div>
+    </div>
+
+</div>
+<style>
+/* .form-group {
+  display: flex;
+  align-items: center;
+} */
+
+
+
+</style>
+{% endblock %}

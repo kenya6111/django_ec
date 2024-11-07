@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load app_tag %}
+{% block content %}
+<form method="POST" action="" id="demo-form2" enctype="multipart/form-data" data-parsley-validate class="form-horizontal form-label-left">{% csrf_token %}
+    <div class="card-body container">
+        <div class="row">
+            <div class="col-md-12 col-sm-12 ">
+                <div class="x_panel">
+                    <div class="x_content">
+                        <br/>
+
+                            <div class="item form-group d-flex mb-2">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align" for="first-name"> 商品名</label>
+                                <div class="col-md-6 col-sm-6 ">
+                                    <input type="text" id="first-name" class="form-control" name="name">
+                                </div>
+                            </div>
+                            <div class="item form-group d-flex mb-2">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align" for="last-name">星</label>
+                                <div class="col-md-6 col-sm-6 ">
+                                    <input type="number" id="last-name" name="star" class="form-control" min="1" max="5">
+                                </div>
+                            </div>
+                            <div class="item form-group d-flex mb-2">
+                                <label for="middle-name" class="col-form-label col-md-3 col-sm-3 label-align">値段</label>
+                                <div class="col-md-6 col-sm-6 ">
+                                    <input id="middle-name" class="form-control" type="number" name="price">
+                                </div>
+                            </div>
+                            <div class="item form-group d-flex mb-2">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align" for="last-name">商品画像</label>
+                                <div class="col-md-6 col-sm-6 ">
+                                    <input type="file" id="last-name2" name="image" class="form-control">
+                                </div>
+                            </div>
+                            <div class="item form-group d-flex mb-2">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align">割引</label>
+                                <div class="col-md-6 col-sm-6 ">
+                                    <div id="gender" class="btn-group" data-toggle="buttons">
+                                        <label class="btn" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
+                                            <input type="radio" name="is_sale" value="male" class="join-btn"> &nbsp; 有り &nbsp;
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ln_solid"></div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-grid gap-4 d-md-block text-center mb-2">
+            <a class="btn btn-secondary " role="button" href="{% url 'list' %}">戻る</a>
+            <input class="btn btn-success" type="submit" value="作成">
+        </div>
+</form>
+
+<!-- <form action="" method="POST" enctype="multipart/form-data">{% csrf_token %}
+    <p>name<input type="text" name="name"></p>
+    <p>star<input type="number" name="star"  min="1" max="5"></p>
+    <p>price<input type="number" name="price"></p>
+    <p><input type="file" name="image"></p>
+    <p>is_sale
+        <input type="radio" name="is_sale" value="True"> Yes
+        <input type="radio" name="is_sale" value="False"> No
+    </p> -->
+    <!-- <input type="hidden" name="author" value="{{ user.username }}"> -->
+    <!-- <div class="d-grid gap-4 d-md-block text-center mb-2">
+        <a class="btn btn-secondary " role="button" >戻る</a>
+        <a class="btn btn-success " role="button" type="submit" >作成</a> -->
+        <!-- <input type="submit" value="作成"> -->
+    <!-- </div>
+</form> -->
+{% endblock %}

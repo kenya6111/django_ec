@@ -27,7 +27,7 @@ environ.Env.read_env(env_file=str(BASE_DIR) + "/.env")
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -55,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'basicauth.middleware.BasicAuthMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -146,3 +147,6 @@ CLOUDINARY_STORAGE  = {
     'API_KEY':env("API_KEY"),
     'API_SECRET':env("API_SECRET")
 }
+
+
+BASICAUTH_USERS = {"admin": "pw"}
