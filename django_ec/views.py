@@ -60,7 +60,6 @@ class ItemList(ListView):
         }
         return ItemModel.objects.search(**params)
 
-
 def admindeletefunc(request):
     return render(request, 'django_ec/admin/delete.html', {})
 
