@@ -68,7 +68,7 @@ class ItemCreate(CreateView):
     template_name = 'django_ec/admin/create.html'
     model = ItemModel
     fields = ('name','star','image','price','is_sale')
-    success_url = reverse_lazy('list') # データの作成完了した後の遷移先
+    success_url = reverse_lazy('admin_list') # データの作成完了した後の遷移先
 
     def form_invalid(self, form):
         print(form.errors)  # デバッグ用にエラー内容を出力
@@ -78,12 +78,12 @@ class ItemEdit(UpdateView):
     template_name = 'django_ec/admin/edit.html'
     model = ItemModel
     fields = ('name','star','image','price','is_sale')
-    success_url = reverse_lazy('list')
+    success_url = reverse_lazy('admin_list')
 @method_decorator(basic_auth_required, name='dispatch')
 class ItemDelete (DeleteView):
     template_name = 'django_ec/admin/delete.html'
     model = ItemModel
-    success_url = reverse_lazy('list')
+    success_url = reverse_lazy('admin_list')
 
 def cartdetailfunc(request):
 
