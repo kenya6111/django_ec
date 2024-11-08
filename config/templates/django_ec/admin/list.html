@@ -22,7 +22,7 @@
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">商品検索</h6>
         </div>
-        <form method="post" action="list" id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">{% csrf_token %}
+        <form method="GET" action="list" id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">{% csrf_token %}
             <div class="card-body container">
                 {% if error_list is not None%}
                     {% for error in error_list %}
