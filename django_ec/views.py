@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 
 from config.settings import BASE_DIR
 from django_ec.models import ItemModel
@@ -88,9 +88,10 @@ class ItemDelete (DeleteView):
     success_url = reverse_lazy('admin_list')
 
 def cartdetailfunc(request):
-
+    print("cartdetail始まり")
     # sessionからカート内情報取得
     cart = request.session.get('cart', {})
+    print(cart)
     id_list = cart.keys()
 
 
@@ -110,14 +111,11 @@ def cartdetailfunc(request):
         else:
             item_price_sum += object.price * v
 
-    # 表示ようリストを作成
+    # 表示用リストを作成
     object_list = {}
     for k, v in cart.items():
         object = ItemModel.objects.get(id = k)
-        # for obj in objects:
-        #     if object.id == obj.id:
         object_list[object] = v
-        
 
 
     return render(request, 'django_ec/cart.html', {'object_list':object_list, 'item_num_sum':item_num_sum, 'item_price_sum':round(item_price_sum)})
@@ -136,7 +134,7 @@ def addcartfunc(request,pk):
 
     cart[pk]=item_num
 
-    # sesionに保存
+    # sesｓionに保存
     request.session['cart'] = cart
 
     # カート内の商品数を算出
@@ -147,11 +145,19 @@ def addcartfunc(request,pk):
     return render(request, 'django_ec/list.html', {'object_list':object_list, 'item_num_sum':item_num_sum})
 
 
-def removefromcartfunc(request):
+def removefromcartfunc(request, pk):
+    cart = request.session.get('cart')
+    print("remove始まり")
+    print(cart)
+    cart.pop(pk)
+    print(cart)
+    print("remove終わり")
+    request.session['cart'] = cart
     # cart = request.session.get('cart', {})
-    request.session["cart"] = {}
+    # request.session["cart"] = {}
     object_list = ItemModel.objects.all()
-    return render(request, 'django_ec/list.html', {'object_list':object_list})
+    return redirect('cartdetail')
+    # return render(request, 'django_ec/cart.html', {'object_list':object_list})
 
 def validate(error_list, star_from, star_to, price_from, price_to, create_date_from, create_date_to):
     if len(star_from) !=0 and len(star_to) != 0:

@@ -74,7 +74,7 @@
                 <!-- <button class="btn btn-secondary dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                   {{ v }}
                 </button> -->
-                <select class="form-select" aria-label="Default select example" id="select-box-{{ k.id }}"  >
+                <select class="form-select form-select-sm mt-1" aria-label="Default select example" id="select-box-{{ k.id }}"  >
                   <option selected>{{ v }}</option>
                   <option value="1">1</option>
                   <option value="2">2</option>
@@ -89,19 +89,23 @@
                 </select>
               <!-- </div> -->
             </div>
-            <span class="text-body-secondary item-price">
-              {% if k.is_sale%}
-                <p><s>
-                    ${{k.price}}
-                </s>
-                    ${{k.price | multiplie:0.6}}
-                </p>
-                {% else %}
-                <p>
-                    ${{ k.price }}
-                </p>
-              {% endif %}
-            </span>
+            <div class="d-flex flex-column justify-content-between align-items-end">
+              <span class="text-body-secondary item-price">
+                {% if k.is_sale%}
+                  <p><s>
+                      ${{k.price}}
+                  </s>
+                      ${{k.price | multiplie:0.6}}
+                  </p>
+                  {% else %}
+                  <p>
+                      ${{ k.price }}
+                  </p>
+                {% endif %}
+              </span>
+              <!-- <button class="btn btn-danger btn-sm mt-auto">削除</button> -->
+              <a class="btn btn-danger btn-sm mt-auto" role="button" href="{% url 'removefromcart' k.id %}">削除</a>
+            </div>
             <!-- <span><p>✖️{{ v }}</p></span> -->
             <input type="hidden" class="item-id" name="item-id" value="{{ k.id }}" />
             <input type="hidden" class="item-count" name="item-count" value="{{ v }}" />
@@ -129,25 +133,7 @@
           </div>
         </form>
         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-2">
-          <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
-            Remove from Cart 
-          </button>
-        </div>
-        
-        <!-- Modal -->
-        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Are you sure you want to remove all items from your cart?</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <a class="btn btn-danger" role="button" href="{% url 'removefromcart' %}">OK</a>
-              </div>
-            </div>
-          </div>
+          <a href="{% url 'list' %}" class="btn btn-secondary" tabindex="-1" role="button">トップへ戻る</a>
         </div>
       </div>
       <div class="col-md-7 col-lg-8">
