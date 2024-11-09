@@ -25,13 +25,15 @@ def listfunc(request):
 
 def detailfunc(request, pk):
     object = get_object_or_404(ItemModel, pk=pk)
-    print(object.created_at)
-    print(object.pk)
+    cart = request.session.get('cart', {})
+    item_num_sum = 0
+    for v in cart.values():
+        item_num_sum += v
 
     object_list = ItemModel.objects.order_by('created_at').reverse()[:4]
 
     print(object_list)
-    return render(request, 'django_ec/detail.html', {'object':object,'object_list':object_list})
+    return render(request, 'django_ec/detail.html', {'object':object,'object_list':object_list, 'item_num_sum':item_num_sum})
 
 @basic_auth_required
 def adminmenufunc(request):
@@ -92,8 +94,7 @@ def cartdetailfunc(request):
     id_list = cart.keys()
 
 
-    object_list = ItemModel.objects.filter(pk__in=id_list)
-    print(object_list)
+    objects = ItemModel.objects.filter(pk__in=id_list)
 
     # 注文数合計取得
     item_num_sum = 0
@@ -109,18 +110,31 @@ def cartdetailfunc(request):
         else:
             item_price_sum += object.price * v
 
+    # 表示ようリストを作成
+    object_list = {}
+    for k, v in cart.items():
+        object = ItemModel.objects.get(id = k)
+        # for obj in objects:
+        #     if object.id == obj.id:
+        object_list[object] = v
+        
+
+
     return render(request, 'django_ec/cart.html', {'object_list':object_list, 'item_num_sum':item_num_sum, 'item_price_sum':round(item_price_sum)})
 
 def addcartfunc(request,pk):
     cart = request.session.get('cart', {})
 
-    # 追加個数分を加算
-    if pk in cart:
-        item_num = cart.get(pk)
-        item_num+=1
-        cart[pk]=item_num
+    item_num = cart.get(pk)
+    if item_num is None:
+        item_num=0;
+
+    if request.method == "POST":
+        item_num+=int(request.POST['input_quantity'])
     else:
-        cart[pk] = 1
+        item_num+=1
+
+    cart[pk]=item_num
 
     # sesionに保存
     request.session['cart'] = cart
@@ -129,7 +143,6 @@ def addcartfunc(request,pk):
     item_num_sum = 0
     for v in cart.values():
         item_num_sum += v
-    print(cart)
     object_list = ItemModel.objects.all()
     return render(request, 'django_ec/list.html', {'object_list':object_list, 'item_num_sum':item_num_sum})
 

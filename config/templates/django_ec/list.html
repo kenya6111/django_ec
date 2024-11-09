@@ -17,7 +17,13 @@
                             <button class="btn btn-outline-dark" type="submit">
                                 <i class="bi-cart-fill me-1"></i>
                                 Cart
-                                <span class="badge bg-dark text-white ms-1 rounded-pill">{{ item_num_sum }}</span>
+                                <span class="badge bg-dark text-white ms-1 rounded-pill">
+                                    {% if item_num_sum == null %}
+                                        0
+                                    {% else%}
+                                        {{ item_num_sum }}
+                                    {% endif %}
+                                </span>
                             </button>
                         </a>
                     </div>
