@@ -62,9 +62,6 @@ class ItemList(ListView):
         }
         return ItemModel.objects.search(**params)
 
-def admindeletefunc(request):
-    return render(request, 'django_ec/admin/delete.html', {})
-
 @method_decorator(basic_auth_required, name='dispatch')
 class ItemCreate(CreateView):
     template_name = 'django_ec/admin/create.html'
@@ -81,6 +78,7 @@ class ItemEdit(UpdateView):
     model = ItemModel
     fields = ('name','star','image','price','is_sale')
     success_url = reverse_lazy('admin_list')
+
 @method_decorator(basic_auth_required, name='dispatch')
 class ItemDelete (DeleteView):
     template_name = 'django_ec/admin/delete.html'

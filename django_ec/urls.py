@@ -6,6 +6,7 @@ from . import views
 
 from .views import listfunc, detailfunc, adminmenufunc,ItemList,admindeletefunc,ItemCreate,ItemEdit,ItemDelete,cartdetailfunc,addcartfunc,removefromcartfunc
 
+
 urlpatterns = [
     path("", views.index, name="index"),
     path("list", views.listfunc, name="list"),
