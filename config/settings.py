@@ -155,3 +155,13 @@ BASICAUTH_USERS = {"admin": "pw"}
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": env("REDIS_URL"),  # Herokuで自動設定された環境変数
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
