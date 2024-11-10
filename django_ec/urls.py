@@ -4,7 +4,7 @@ from django.urls import path
 from django.views.generic.base import TemplateView
 from . import views
 
-from .views import listfunc, detailfunc, adminmenufunc,ItemList,admindeletefunc,ItemCreate,ItemEdit,ItemDelete,cartdetailfunc,addcartfunc,removefromcartfunc
+from .views import listfunc, detailfunc, adminmenufunc,ItemList,ItemCreate,ItemEdit,ItemDelete,cartdetailfunc,addcartfunc,removefromcartfunc
 
 
 urlpatterns = [
