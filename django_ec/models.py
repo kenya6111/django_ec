@@ -1,5 +1,6 @@
 import datetime
 from django.db import models
+from django.contrib.auth import get_user_model
 
 # Create your models here.
 class ItemQuerySet(models.QuerySet):
@@ -52,3 +53,17 @@ class ItemModel(models.Model):
         db_table = 'items'
 
     objects = ItemQuerySet.as_manager()
+
+class CartModel(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CartItemModel(models.Model):
+    cart = models.ForeignKey(CartModel, on_delete=models.CASCADE, related_name='cart_items')
+    Item = models.ForeignKey(ItemModel, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
