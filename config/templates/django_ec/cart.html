@@ -74,7 +74,7 @@
                 <!-- <button class="btn btn-secondary dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                   {{ v }}
                 </button> -->
-                <select class="form-select form-select-sm mt-1" aria-label="Default select example" id="select-box-{{ k.id }}"  >
+                <select class="form-select form-select-sm mt-1" aria-label="Default select example" id="select-box-{{ object.Item.id }}" onchange="inputChange()">
                   <option selected>{{ object.quantity }}</option>
                   <option value="1">1</option>
                   <option value="2">2</option>
@@ -107,9 +107,10 @@
               <a class="btn btn-danger btn-sm mt-auto" role="button" href="{% url 'removefromcart' object.Item.id %}">削除</a>
             </div>
             <!-- <span><p>✖️{{ v }}</p></span> -->
-            <input type="hidden" class="item-id" name="item-id" value="{{ object.id }}" />
+            <input type="hidden" class="item-id" name="item-id" value="{{ object.Item.id }}" />
             <input type="hidden" class="item-count" name="item-count" value="{{ object.quantity }}" />
-            <input type="hidden" id="item-price-{{ k.id}}" name="item-price-{{ object.id}}" value="{{ object.price }}" />
+            <input type="hidden" class="is_sale" name="item-count" value="{{ object.Item.is_sale }}" />
+            <input type="hidden" id="item-price-{{ object.Item.id}}" name="item-price-{{ object.Item.id}}" value="{{ object.Item.price }}" />
           </li>
           {% endfor %}
           <li class="list-group-item d-flex justify-content-between bg-body-tertiary">
