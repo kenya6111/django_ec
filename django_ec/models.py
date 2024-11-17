@@ -55,13 +55,19 @@ class ItemModel(models.Model):
     objects = ItemQuerySet.as_manager()
 
 class CartModel(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    @property
+    def item_num_sum (self):
+        return sum(item.quantity for item in self.cart_items.all())
+    @property
+    def item_price_sum(self):
+        return sum(item.item.price*0.6*item.quantity if item.item.is_sale else item.item.price*item.quantity for item in self.cart_items.all())
+
 class CartItemModel(models.Model):
     cart = models.ForeignKey(CartModel, on_delete=models.CASCADE, related_name='cart_items')
-    Item = models.ForeignKey(ItemModel, on_delete=models.CASCADE)
+    item = models.ForeignKey(ItemModel, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

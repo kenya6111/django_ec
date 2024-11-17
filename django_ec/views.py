@@ -15,13 +15,13 @@ def index(request):
 
 def listfunc(request):
     cart = get_or_create_cart(request)
-    item_num_sum = sum(item.quantity for item in cart.cart_items.all())
+    item_num_sum = cart.item_num_sum
     object_list = ItemModel.objects.all()
     return render(request, 'django_ec/list.html',{"object_list":object_list, 'item_num_sum':item_num_sum})
 
 def detailfunc(request, pk):
     cart = get_or_create_cart(request)
-    item_num_sum = sum(item.quantity for item in cart.cart_items.all())
+    item_num_sum = cart.item_num_sum
     object = get_object_or_404(ItemModel, pk=pk)
     object_list = ItemModel.objects.order_by('created_at').reverse()[:4]
     return render(request, 'django_ec/detail.html', {'object':object,'object_list':object_list, 'item_num_sum':item_num_sum})
@@ -30,9 +30,6 @@ def detailfunc(request, pk):
 def adminmenufunc(request):
     menu_list = list(Menu)
     print(menu_list)
-    for ob in menu_list:
-        print(ob.name)
-        print(ob.id)
     return render(request, 'django_ec/admin/menu.html', {'menu_list':menu_list})
 @method_decorator(basic_auth_required, name='dispatch')
 class ItemList(ListView):
@@ -61,7 +58,6 @@ class ItemCreate(CreateView):
     success_url = reverse_lazy('admin_list') # データの作成完了した後の遷移先
 
     def form_invalid(self, form):
-        print(form.errors)  # デバッグ用にエラー内容を出力
         return super().form_invalid(form)
 @method_decorator(basic_auth_required, name='dispatch')
 class ItemEdit(UpdateView):
@@ -78,51 +74,22 @@ class ItemDelete (DeleteView):
 
 def cartdetailfunc(request):
     cart = get_or_create_cart(request)
-    item_num_sum = sum(item.quantity for item in cart.cart_items.all())
-    item_price_sum = sum(item.Item.price*0.6*item.quantity if item.Item.is_sale else item.Item.price*item.quantity for item in cart.cart_items.all())
-
-    # sessionからカート内情報取得
-    # cart = request.session.get('cart', {})
-    # id_list = cart.keys()
-
-    print([item for item in cart.cart_items.all()])
-    # objects = ItemModel.objects.filter(pk__in=id_list)
-
-    # 表示用リストを作成
-    # object_list = {}
-    # for k, v in cart.items():
-    #     object = ItemModel.objects.get(id = k)
-    #     object_list[object] = v
-
+    item_num_sum = cart.item_num_sum
+    item_price_sum = cart.item_price_sum
     return render(request, 'django_ec/cart.html', {'object_list':[item for item in cart.cart_items.all()], 'item_num_sum':item_num_sum, 'item_price_sum':round(item_price_sum)})
 
 def addcartfunc(request,pk):
     # cart = request.session.get('cart_id')
     cart = get_or_create_cart(request)
-    print(111)
-    print(cart)
     item = get_object_or_404(ItemModel,pk=pk)
-    print(222)
-    print(item)
-
-    # CartItem = CartItemModel.objects.get(cart=cart , Item=item)
-    # CartItemを取得または作成し、数量を増やす
-    cart_item = CartItemModel.objects.get_or_create(cart=cart, Item=item)
-    print(333)
-    print(cart_item)
+    cart_item = CartItemModel.objects.get_or_create(cart=cart, item=item)
     if request.method == "POST":
         cart_item[0].quantity += int(request.POST['input_quantity'])
     else:
         cart_item[0].quantity += 1
     cart_item[0].save()
 
-    item_num_sum = sum(item.quantity for item in cart.cart_items.all())
-
-    print(444)
-    print(cart.cart_items.all())
-    print(444)
-    print(item_num_sum)
-
+    item_num_sum = cart.item_num_sum
     object_list = ItemModel.objects.all()
 
     return render(request, 'django_ec/list.html', {'object_list':object_list, 'item_num_sum':item_num_sum})
@@ -131,12 +98,7 @@ def addcartfunc(request,pk):
 def removefromcartfunc(request, pk):
     cart = get_or_create_cart(request)
     item = get_object_or_404(ItemModel,pk=pk)
-    CartItemModel.objects.get(cart=cart, Item=item).delete()
-
-    # cart = request.session.get('cart')
-    # cart.pop(pk)
-    # request.session['cart'] = cart
-    # object_list = ItemModel.objects.all()
+    CartItemModel.objects.get(cart=cart, item=item).delete()
     return redirect('cartdetail')
 
 
@@ -155,7 +117,6 @@ def validate(error_list, star_from, star_to, price_from, price_to, create_date_f
         if create_date_from >= create_date_to:
             error_list.append("作成日の開始日は終了日より小さい値を設定してください")
             return False
-    
     return True
 
 def get_or_create_cart(request):
