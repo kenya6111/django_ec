@@ -1,7 +1,7 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 
 from config.settings import BASE_DIR
-from django_ec.models import ItemModel
+from django_ec.models import ItemModel,ItemModel,CartModel,CartItemModel
 import environ
 from .constants.consts import Menu
 from django.views.generic import CreateView,UpdateView,DeleteView, ListView
@@ -14,26 +14,22 @@ def index(request):
     return render(request, 'index.html')
 
 def listfunc(request):
+    cart = get_or_create_cart(request)
+    item_num_sum = cart.item_num_sum
     object_list = ItemModel.objects.all()
-    return render(request, 'django_ec/list.html',{"object_list":object_list})
+    return render(request, 'django_ec/list.html',{"object_list":object_list, 'item_num_sum':item_num_sum})
 
 def detailfunc(request, pk):
+    cart = get_or_create_cart(request)
+    item_num_sum = cart.item_num_sum
     object = get_object_or_404(ItemModel, pk=pk)
-    print(object.created_at)
-    print(object.pk)
-
     object_list = ItemModel.objects.order_by('created_at').reverse()[:4]
-
-    print(object_list)
-    return render(request, 'django_ec/detail.html', {'object':object,'object_list':object_list})
+    return render(request, 'django_ec/detail.html', {'object':object,'object_list':object_list, 'item_num_sum':item_num_sum})
 
 @basic_auth_required
 def adminmenufunc(request):
     menu_list = list(Menu)
     print(menu_list)
-    for ob in menu_list:
-        print(ob.name)
-        print(ob.id)
     return render(request, 'django_ec/admin/menu.html', {'menu_list':menu_list})
 @method_decorator(basic_auth_required, name='dispatch')
 class ItemList(ListView):
@@ -54,31 +50,56 @@ class ItemList(ListView):
         }
         return ItemModel.objects.search(**params)
 
-
-def admindeletefunc(request):
-    return render(request, 'django_ec/admin/delete.html', {})
-
 @method_decorator(basic_auth_required, name='dispatch')
 class ItemCreate(CreateView):
     template_name = 'django_ec/admin/create.html'
     model = ItemModel
     fields = ('name','star','image','price','is_sale')
-    success_url = reverse_lazy('list') # データの作成完了した後の遷移先
+    success_url = reverse_lazy('admin_list') # データの作成完了した後の遷移先
 
     def form_invalid(self, form):
-        print(form.errors)  # デバッグ用にエラー内容を出力
         return super().form_invalid(form)
 @method_decorator(basic_auth_required, name='dispatch')
 class ItemEdit(UpdateView):
     template_name = 'django_ec/admin/edit.html'
     model = ItemModel
     fields = ('name','star','image','price','is_sale')
-    success_url = reverse_lazy('list')
+    success_url = reverse_lazy('admin_list')
+
 @method_decorator(basic_auth_required, name='dispatch')
 class ItemDelete (DeleteView):
     template_name = 'django_ec/admin/delete.html'
     model = ItemModel
-    success_url = reverse_lazy('list')
+    success_url = reverse_lazy('admin_list')
+
+def cartdetailfunc(request):
+    cart = get_or_create_cart(request)
+    item_num_sum = cart.item_num_sum
+    item_price_sum = cart.item_price_sum
+    return render(request, 'django_ec/cart.html', {'object_list':[item for item in cart.cart_items.all()], 'item_num_sum':item_num_sum, 'item_price_sum':round(item_price_sum)})
+
+def addcartfunc(request,pk):
+    # cart = request.session.get('cart_id')
+    cart = get_or_create_cart(request)
+    item = get_object_or_404(ItemModel,pk=pk)
+    cart_item = CartItemModel.objects.get_or_create(cart=cart, item=item)
+    if request.method == "POST":
+        cart_item[0].quantity += int(request.POST['input_quantity'])
+    else:
+        cart_item[0].quantity += 1
+    cart_item[0].save()
+
+    item_num_sum = cart.item_num_sum
+    object_list = ItemModel.objects.all()
+
+    return render(request, 'django_ec/list.html', {'object_list':object_list, 'item_num_sum':item_num_sum})
+
+
+def removefromcartfunc(request, pk):
+    cart = get_or_create_cart(request)
+    item = get_object_or_404(ItemModel,pk=pk)
+    CartItemModel.objects.get(cart=cart, item=item).delete()
+    return redirect('cartdetail')
 
 
 def validate(error_list, star_from, star_to, price_from, price_to, create_date_from, create_date_to):
@@ -96,5 +117,13 @@ def validate(error_list, star_from, star_to, price_from, price_to, create_date_f
         if create_date_from >= create_date_to:
             error_list.append("作成日の開始日は終了日より小さい値を設定してください")
             return False
-    
     return True
+
+def get_or_create_cart(request):
+    cart_id = request.session.get('cart_id')
+    if cart_id:
+        cart = get_object_or_404(CartModel, id=cart_id)
+    else:
+        cart = CartModel.objects.create()
+        request.session['cart_id'] = cart.id
+    return cart
