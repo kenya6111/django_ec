@@ -1,13 +1,18 @@
 from django.shortcuts import get_object_or_404, render, redirect
 
 from config.settings import BASE_DIR
-from django_ec.models import ItemModel,ItemModel,CartModel,CartItemModel
+from django_ec.models import ItemModel,ItemModel,CartModel,CartItemModel,CheckoutModel,PurchaseDetailModel
 import environ
 from .constants.consts import Menu
 from django.views.generic import CreateView,UpdateView,DeleteView, ListView
 from django.urls import reverse_lazy
 from basicauth.decorators import basic_auth_required
 from django.utils.decorators import method_decorator
+from django.contrib import messages
+
+from django.shortcuts import render
+from django.core.mail import BadHeaderError, send_mail
+from django.http import HttpResponse, HttpResponseRedirect
 # Create your views here.
 
 def index(request):
@@ -72,6 +77,39 @@ class ItemDelete (DeleteView):
     model = ItemModel
     success_url = reverse_lazy('admin_list')
 
+@basic_auth_required
+def adminpurchacelistfunc(request):
+    params = {
+        "create_date_from" : request.GET.get("create-date-from", None),
+        "create_date_to" : request.GET.get("create-date-to", None)
+    }
+    purchasedetails = PurchaseDetailModel.objects.search(**params)
+    return render(request, 'django_ec/admin/purchace_list.html', {"object_list":purchasedetails})
+
+@basic_auth_required
+def adminpurchacedetailfunc(request, pk):
+    purchase_detail = PurchaseDetailModel.objects.get(pk=pk)
+    checkout_id = purchase_detail.checkout.id
+
+    checkout = CheckoutModel.objects.get(pk=checkout_id)
+
+    items = purchase_detail.item_list.split(", ")
+    item_price_list = purchase_detail.item_price_list.split(",")
+    print(item_price_list)
+    name_quantity_price_total_list=[]
+    for i in range(len(items)):
+        item = items[i]
+        name_quantity = items[i].split("✖︎")
+        obj = {}
+        obj["name"] = name_quantity[0]
+        obj["quantity"] = name_quantity[1]
+        obj["price"] = item_price_list[i]
+        obj["total"] = int(item_price_list[i]) * int(name_quantity[1])
+        name_quantity_price_total_list.append(obj)
+    print(name_quantity_price_total_list)
+
+    return render(request, 'django_ec/admin/purchace_detail.html', {'checkout':checkout, 'purchase_detail':purchase_detail, 'name_quantity_price_total_list':name_quantity_price_total_list})
+
 def cartdetailfunc(request):
     cart = get_or_create_cart(request)
     item_num_sum = cart.item_num_sum
@@ -101,6 +139,91 @@ def removefromcartfunc(request, pk):
     CartItemModel.objects.get(cart=cart, item=item).delete()
     return redirect('cartdetail')
 
+def checkoutfunc(request):
+    if request.method == 'POST':
+        cart = get_or_create_cart(request)
+        first_name = request.POST.get("firstName", None)
+        last_name = request.POST.get("lastName", None)
+        username = request.POST.get("username", None)
+        email = request.POST.get("email", None)
+        address1 = request.POST.get("address", None)
+        address2 = request.POST.get("address2", None)
+        country = request.POST.get("country", None)
+        state = request.POST.get("state", None)
+        zip_code = request.POST.get("zip", None)
+        name_card = request.POST.get("nameCard", None)
+        credit_number = request.POST.get("creditNum", None)
+        expiration = request.POST.get("expiration", None)
+        cvv = request.POST.get("cvv", None)
+        checkout = CheckoutModel(cart=cart,first_name=first_name,last_name=last_name,user_name = username,email=email,address1=address1,address2=address2,country=country,state=state,zip_code=zip_code,name_on_card=name_card,credit_number=credit_number,credit_expiration=expiration,cvv=cvv)
+        checkout.save()
+
+        # カート内の総額
+        sum_price=0
+        item_list =[]
+        item_price_list=[]
+        is_sale_list=[]
+        for cart_item in cart.cart_items.all():
+            if cart_item.item.is_sale:
+                sum_price += cart_item.item.price* 0.6 * cart_item.quantity
+                item_price_list.append(str(round(cart_item.item.price*0.6)))
+            else:
+                sum_price += cart_item.item.price * cart_item.quantity
+                item_price_list.append(str(round(cart_item.item.price)))
+            item_list.append(f"{cart_item.item.name}✖︎{cart_item.quantity}")
+        item_list_info = ", ".join(item_list)
+        item_price_info = ",".join(item_price_list)
+
+        PurchaseDetailModel.objects.create(
+            checkout=checkout,
+            total_price = sum_price,
+            item_list=item_list_info,
+            item_name=cart_item.item.name,
+            item_price=cart_item.item.price,
+            item_price_list=item_price_info,
+            quantity=cart_item.quantity,
+        )
+
+        messages.success(request, '購入ありがとうございます')
+        item_num_sum = cart.item_num_sum
+        item_price_sum = round(cart.item_price_sum)
+
+
+        cart_item = CartItemModel.objects.filter(cart=cart)
+
+        order_infos=""
+        for item in cart_item:
+            item_name = item.item.name
+            item_quantity = item.quantity
+            order_info=f""" 商品名: {item_name}\n 個数: {item_quantity}\n\n"""
+            order_infos += order_info
+
+
+        """題名"""
+        subject = "【ご購入ありがとうございます】注文確認メール"
+        """本文"""
+        message = f"""ご注文いただきありがとうございます。\n以下の内容でご注文を承りました。商品の発送準備が整い次第、再度ご連絡いたします。\n\n【ご注文内容】\n{order_infos} 合計金額: ¥{item_price_sum}（税込）\n\n【お届け先情報】\n  お名前: {last_name} {first_name}\n  住所: {country} {address1} {address2}\n  メールアドレス: {email}\n\n【ご注文番号】\n{cart.id}\nこのメールは送信専用です。ご質問やご不明な点がございましたら、当店のカスタマーサポートまでご連絡ください。\n--------------------------\nDjango_EC\nURL: https://example.com\nメール: support@example.com\n電話番号: 03-1234-5678\n--------------------------\n"""
+
+        """送信元メールアドレス"""
+        from_email = "kenyanke6111@gmail.com"
+        """宛先メールアドレス"""
+        recipient_list = [
+            email
+        ]
+
+
+        send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+
+        # カートを削除
+        cart.delete()
+
+        item_num_sum=0
+        request.session.clear()
+        object_list = ItemModel.objects.all()
+        return render(request, 'django_ec/list.html', {'object_list':object_list, 'item_num_sum':item_num_sum, 'is_checkouted':True })
+
+
+    return redirect('list')
 
 def validate(error_list, star_from, star_to, price_from, price_to, create_date_from, create_date_to):
     if len(star_from) !=0 and len(star_to) != 0:

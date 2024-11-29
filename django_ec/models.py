@@ -35,6 +35,16 @@ class ItemQuerySet(models.QuerySet):
             queryset = queryset.filter(created_at__lte=kwargs["create_date_to"])
 
         return queryset
+class PurchaseDetaiQuerySet(models.QuerySet):
+    def search(self,**kwargs):
+        queryset = self;
+
+        if kwargs.get("create_date_from"):
+            queryset = queryset.filter(created_at__gte=kwargs["create_date_from"])
+        if kwargs.get("create_date_to"):
+            queryset = queryset.filter(created_at__lte=kwargs["create_date_to"])
+
+        return queryset
 
 class ItemModel(models.Model):
     name = models.CharField(max_length=100)
@@ -71,5 +81,41 @@ class CartItemModel(models.Model):
     quantity = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+class CheckoutModel(models.Model):
+    cart = models.OneToOneField(CartModel, on_delete=models.SET_NULL, related_name='checkout', null=True, blank=True)
+    first_name = models.CharField(max_length=50,blank=True, null=True)
+    last_name = models.CharField(max_length=50,blank=True, null=True)
+    user_name = models.CharField(max_length=50,blank=True, null=True)
+    email = models.EmailField(max_length=100,blank=True, null=True)
+    address1 = models.CharField(max_length=100,blank=True, null=True)
+    address2 = models.CharField(max_length=100, blank=True, null=True)
+    country = models.CharField(max_length=100,blank=True, null=True)
+    state = models.CharField(max_length=100,blank=True, null=True)
+    zip_code = models.CharField(max_length=20,blank=True, null=True)
+
+    name_on_card = models.CharField(max_length=100,blank=True, null=True)
+    credit_number=models.CharField(max_length=100,null=True,blank=True)
+    credit_expiration = models.CharField(max_length=10,blank=True, null=True)
+    cvv = models.PositiveSmallIntegerField(blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
+
+class PurchaseDetailModel(models.Model):
+    checkout = models.ForeignKey(CheckoutModel, on_delete=models.CASCADE, related_name='purchase_details')
+    total_price = models.BigIntegerField(default=0)
+    item_list = models.CharField(max_length=100,blank=True, null=True)
+    item_name = models.CharField(max_length=100)
+    item_price = models.IntegerField(default=0)
+    item_price_list = models.CharField(max_length=100,blank=True, null=True)
+    quantity = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    objects = PurchaseDetaiQuerySet.as_manager()
+
+    def __str__(self):
+        return f"checkout:{self.checkout.id} [{self.item_name} x {self.quantity} ({self.total_price}円]"
+
 
 

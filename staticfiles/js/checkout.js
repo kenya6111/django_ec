@@ -10,10 +10,10 @@ function inputChange(){
 
     isSale = eles[i].getElementsByClassName('is_sale')[0].value === 'True'
     console.log(isSale+":issale");
-
+    
     itemPrice = parseFloat(document.getElementById(`item-price-${itemId}`).value);
     console.log(itemPrice+":itemprice");
-
+    
     if(isSale)
     {
       totalPrice += itemPrice*0.6*itemCount
@@ -26,4 +26,20 @@ function inputChange(){
   console.log(totalPrice+"totalprice")
   let element = document.getElementById('item-price-sum');
   element.innerHTML = "$"+totalPrice;
+
 }
+
+
+  // Fetch all the forms we want to apply custom Bootstrap validation styles to
+  (function() {
+    const formsuuu = document.querySelectorAll('.needs-validation');
+    formsuuu.forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      });
+    });
+  })();
