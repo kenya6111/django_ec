@@ -98,18 +98,17 @@ class CheckoutModel(models.Model):
     credit_number=models.CharField(max_length=100,null=True,blank=True)
     credit_expiration = models.CharField(max_length=10,blank=True, null=True)
     cvv = models.PositiveSmallIntegerField(blank=True, null=True)
+    total_price = models.BigIntegerField(default=0)
 
     created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True,blank=True, null=True)
 
 class PurchaseDetailModel(models.Model):
     checkout = models.ForeignKey(CheckoutModel, on_delete=models.CASCADE, related_name='purchase_details')
-    total_price = models.BigIntegerField(default=0)
-    item_list = models.CharField(max_length=100,blank=True, null=True)
     item_name = models.CharField(max_length=100)
     item_price = models.IntegerField(default=0)
-    item_price_list = models.CharField(max_length=100,blank=True, null=True)
     quantity = models.IntegerField(default=0)
+    is_sale = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     objects = PurchaseDetaiQuerySet.as_manager()

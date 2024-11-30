@@ -10,9 +10,9 @@
             <h5>注文情報</h5>
         </div>
         <div class="card-body">
-            <p><strong>注文ID:</strong> {{ purchase_detail.id }}</p>
-            <p><strong>注文日時:</strong> {{ purchase_detail.created_at|date:"Y-m-d H:i" }}</p>
-            <p><strong>合計金額:</strong> ¥{{ purchase_detail.total_price }}</p>
+            <p><strong>注文ID:</strong> {{ checkout.id }}</p>
+            <p><strong>注文日時:</strong> {{ checkout.created_at|date:"Y-m-d H:i" }}</p>
+            <p><strong>合計金額:</strong> ¥{{ checkout.total_price }}</p>
             <p><strong>配送先:</strong> {{ checkout.address1 }} {{ checkout.address2 }}, {{ checkout.city }}, {{ checkout.state }}, {{ checkout.country }}</p>
         </div>
     </div>
@@ -29,20 +29,22 @@
                         <th>商品名</th>
                         <th>価格</th>
                         <th>数量</th>
-                        <th>小計</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for item in name_quantity_price_total_list %}
+                    {% for item in purchase_details %}
                     <tr>
-                        <td>{{ item.name }}</td>
-                        <td>¥{{ item.price }}</td>
+                        <td>{{ item.item_name }}</td>
+                        <td>¥{{ item.item_price }}</td>
                         <td>{{ item.quantity }}</td>
-                        <td>{{ item.total }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
+            <div class="d-flex justify-content-end align-items-center mt-3">
+                <span class="me-2 text-muted fs-5">合計金額:</span>
+                <span class="fw-bold text-danger fs-4">¥{{ total_price }}</span>
+            </div>
         </div>
     </div>
 

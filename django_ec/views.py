@@ -84,31 +84,35 @@ def adminpurchacelistfunc(request):
         "create_date_to" : request.GET.get("create-date-to", None)
     }
     purchasedetails = PurchaseDetailModel.objects.search(**params)
-    return render(request, 'django_ec/admin/purchace_list.html', {"object_list":purchasedetails})
+
+    grouped_data = {}
+    for purchasedetail in purchasedetails:
+        checkout_id = purchasedetail.checkout.id
+        if checkout_id not in grouped_data.keys():
+            grouped_data[checkout_id] ={
+                'checkout': purchasedetail.checkout,
+                'details': [],
+            }
+        grouped_data[checkout_id]['details'].append(purchasedetail)
+    return render(request, 'django_ec/admin/purchace_list.html', {"object_list":grouped_data})
 
 @basic_auth_required
 def adminpurchacedetailfunc(request, pk):
-    purchase_detail = PurchaseDetailModel.objects.get(pk=pk)
-    checkout_id = purchase_detail.checkout.id
+    checkout = CheckoutModel.objects.get(pk=pk)
 
-    checkout = CheckoutModel.objects.get(pk=checkout_id)
+    purchase_details = PurchaseDetailModel.objects.filter(checkout=checkout)
 
-    items = purchase_detail.item_list.split(", ")
-    item_price_list = purchase_detail.item_price_list.split(",")
-    print(item_price_list)
-    name_quantity_price_total_list=[]
-    for i in range(len(items)):
-        item = items[i]
-        name_quantity = items[i].split("✖︎")
-        obj = {}
-        obj["name"] = name_quantity[0]
-        obj["quantity"] = name_quantity[1]
-        obj["price"] = item_price_list[i]
-        obj["total"] = int(item_price_list[i]) * int(name_quantity[1])
-        name_quantity_price_total_list.append(obj)
-    print(name_quantity_price_total_list)
 
-    return render(request, 'django_ec/admin/purchace_detail.html', {'checkout':checkout, 'purchase_detail':purchase_detail, 'name_quantity_price_total_list':name_quantity_price_total_list})
+    grouped_data = {}
+    for purchasedetail in purchase_details:
+        checkout_id = purchasedetail.checkout.id
+        if checkout_id not in grouped_data.keys():
+            grouped_data[checkout_id] ={
+                'checkout': purchasedetail.checkout,
+                'details': [],
+            }
+        grouped_data[checkout_id]['details'].append(purchasedetail)
+    return render(request, 'django_ec/admin/purchace_detail.html', {'checkout':checkout, 'purchase_details':purchase_details, "total_price":purchase_details[0].checkout.total_price})
 
 def cartdetailfunc(request):
     cart = get_or_create_cart(request)
@@ -142,6 +146,14 @@ def removefromcartfunc(request, pk):
 def checkoutfunc(request):
     if request.method == 'POST':
         cart = get_or_create_cart(request)
+        # カート内の総額
+        total_price=0
+        for cart_item in cart.cart_items.all():
+            if cart_item.item.is_sale:
+                total_price += cart_item.item.price* 0.6 * cart_item.quantity
+            else:
+                total_price += cart_item.item.price * cart_item.quantity
+
         first_name = request.POST.get("firstName", None)
         last_name = request.POST.get("lastName", None)
         username = request.POST.get("username", None)
@@ -155,33 +167,22 @@ def checkoutfunc(request):
         credit_number = request.POST.get("creditNum", None)
         expiration = request.POST.get("expiration", None)
         cvv = request.POST.get("cvv", None)
-        checkout = CheckoutModel(cart=cart,first_name=first_name,last_name=last_name,user_name = username,email=email,address1=address1,address2=address2,country=country,state=state,zip_code=zip_code,name_on_card=name_card,credit_number=credit_number,credit_expiration=expiration,cvv=cvv)
+        checkout = CheckoutModel(cart=cart,first_name=first_name,last_name=last_name,user_name = username,email=email,address1=address1,address2=address2,country=country,state=state,zip_code=zip_code,name_on_card=name_card,credit_number=credit_number,credit_expiration=expiration,cvv=cvv, total_price=total_price)
         checkout.save()
 
-        # カート内の総額
-        sum_price=0
-        item_list =[]
-        item_price_list=[]
-        is_sale_list=[]
-        for cart_item in cart.cart_items.all():
-            if cart_item.item.is_sale:
-                sum_price += cart_item.item.price* 0.6 * cart_item.quantity
-                item_price_list.append(str(round(cart_item.item.price*0.6)))
-            else:
-                sum_price += cart_item.item.price * cart_item.quantity
-                item_price_list.append(str(round(cart_item.item.price)))
-            item_list.append(f"{cart_item.item.name}✖︎{cart_item.quantity}")
-        item_list_info = ", ".join(item_list)
-        item_price_info = ",".join(item_price_list)
 
-        PurchaseDetailModel.objects.create(
+        cart_items = CartItemModel.objects.filter(cart=cart)
+        for cart_item in cart_items:
+            if cart_item.item.is_sale:
+                price=cart_item.item.price*0.6
+            else:
+                price=cart_item.item.price
+            PurchaseDetailModel.objects.create(
             checkout=checkout,
-            total_price = sum_price,
-            item_list=item_list_info,
             item_name=cart_item.item.name,
-            item_price=cart_item.item.price,
-            item_price_list=item_price_info,
+            item_price=price,
             quantity=cart_item.quantity,
+            is_sale=cart_item.item.is_sale
         )
 
         messages.success(request, '購入ありがとうございます')
@@ -221,8 +222,6 @@ def checkoutfunc(request):
         request.session.clear()
         object_list = ItemModel.objects.all()
         return render(request, 'django_ec/list.html', {'object_list':object_list, 'item_num_sum':item_num_sum, 'is_checkouted':True })
-
-
     return redirect('list')
 
 def validate(error_list, star_from, star_to, price_from, price_to, create_date_from, create_date_to):
