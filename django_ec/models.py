@@ -113,8 +113,5 @@ class PurchaseDetailModel(models.Model):
 
     objects = PurchaseDetaiQuerySet.as_manager()
 
-    def __str__(self):
-        return f"checkout:{self.checkout.id} [{self.item_name} x {self.quantity} ({self.total_price}円]"
-
 
 
