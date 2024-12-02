@@ -32,18 +32,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for item in purchase_details %}
+                    {% for detail in checkout.purchase_details.all %}
                     <tr>
-                        <td>{{ item.item_name }}</td>
-                        <td>¥{{ item.item_price }}</td>
-                        <td>{{ item.quantity }}</td>
+                        <td>{{ detail.item_name }}</td>
+                        <td>¥{{ detail.item_price }}</td>
+                        <td>{{ detail.quantity }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
             <div class="d-flex justify-content-end align-items-center mt-3">
                 <span class="me-2 text-muted fs-5">合計金額:</span>
-                <span class="fw-bold text-danger fs-4">¥{{ total_price }}</span>
+                <span class="fw-bold text-danger fs-4">¥{{ checkout.total_price }}</span>
             </div>
         </div>
     </div>

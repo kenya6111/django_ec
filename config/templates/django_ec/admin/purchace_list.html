@@ -89,16 +89,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for checkout_id, object in object_list.items %}
-                        <tr data-href="{% url 'admin_purchace_detail' checkout_id %}" class="history-row">
-                            <td>{{ object.checkout.id }}</td>
-                            <td>{{ object.checkout.created_at|date:"Y-m-j H:i:s" }}</td>
+                        {% for object in object_list %}
+                        <tr data-href="{% url 'admin_purchace_detail' object.id %}" class="history-row">
+                            <td>{{ object.id }}</td>
+                            <td>{{ object.created_at|date:"Y-m-j H:i:s" }}</td>
                             <td>
-                                {% for detail in object.details %}
+                                {% for detail in object.purchase_details.all %}
                                     {{ detail.item_name }} x {{ detail.quantity }}<br>
                                 {% endfor %}
                             </td>
-                            <td>{{ object.checkout.total_price }}</td>
+                            <td>{{ object.total_price }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

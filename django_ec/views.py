@@ -83,36 +83,21 @@ def adminpurchacelistfunc(request):
         "create_date_from" : request.GET.get("create-date-from", None),
         "create_date_to" : request.GET.get("create-date-to", None)
     }
-    purchasedetails = PurchaseDetailModel.objects.search(**params)
+    checkouts = CheckoutModel.objects.prefetch_related('purchase_details')
 
-    grouped_data = {}
-    for purchasedetail in purchasedetails:
-        checkout_id = purchasedetail.checkout.id
-        if checkout_id not in grouped_data.keys():
-            grouped_data[checkout_id] ={
-                'checkout': purchasedetail.checkout,
-                'details': [],
-            }
-        grouped_data[checkout_id]['details'].append(purchasedetail)
-    return render(request, 'django_ec/admin/purchace_list.html', {"object_list":grouped_data})
+     # 作成日の範囲でフィルタリング
+    if params["create_date_from"]:
+        checkouts = checkouts.filter(created_at__gte=params["create_date_from"])
+    if params["create_date_to"]:
+        checkouts = checkouts.filter(created_at__lte=params["create_date_to"])
+
+    return render(request, 'django_ec/admin/purchace_list.html', {"object_list":checkouts})
 
 @basic_auth_required
 def adminpurchacedetailfunc(request, pk):
-    checkout = CheckoutModel.objects.get(pk=pk)
-
-    purchase_details = PurchaseDetailModel.objects.filter(checkout=checkout)
-
-
-    grouped_data = {}
-    for purchasedetail in purchase_details:
-        checkout_id = purchasedetail.checkout.id
-        if checkout_id not in grouped_data.keys():
-            grouped_data[checkout_id] ={
-                'checkout': purchasedetail.checkout,
-                'details': [],
-            }
-        grouped_data[checkout_id]['details'].append(purchasedetail)
-    return render(request, 'django_ec/admin/purchace_detail.html', {'checkout':checkout, 'purchase_details':purchase_details, "total_price":purchase_details[0].checkout.total_price})
+    # checkout = CheckoutModel.objects.get(pk=pk)
+    checkout = CheckoutModel.objects.prefetch_related('purchase_details').get(pk=pk)
+    return render(request, 'django_ec/admin/purchace_detail.html', {'checkout':checkout})
 
 def cartdetailfunc(request):
     cart = get_or_create_cart(request)
