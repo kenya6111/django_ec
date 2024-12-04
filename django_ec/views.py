@@ -131,9 +131,10 @@ def removefromcartfunc(request, pk):
 def checkoutfunc(request):
     if request.method == 'POST':
         cart = get_or_create_cart(request)
+        cart_items = cart.cart_items.all()
         # カート内の総額
         total_price=0
-        for cart_item in cart.cart_items.all():
+        for cart_item in cart_items:
             if cart_item.item.is_sale:
                 total_price += cart_item.item.price* 0.6 * cart_item.quantity
             else:
@@ -155,8 +156,8 @@ def checkoutfunc(request):
         checkout = CheckoutModel(cart=cart,first_name=first_name,last_name=last_name,user_name = username,email=email,address1=address1,address2=address2,country=country,state=state,zip_code=zip_code,name_on_card=name_card,credit_number=credit_number,credit_expiration=expiration,cvv=cvv, total_price=total_price)
         checkout.save()
 
-
-        cart_items = CartItemModel.objects.filter(cart=cart)
+        cart_items = cart_items.filter(cart=cart)
+        order_infos=""
         for cart_item in cart_items:
             if cart_item.item.is_sale:
                 price=cart_item.item.price*0.6
@@ -168,22 +169,13 @@ def checkoutfunc(request):
             item_price=price,
             quantity=cart_item.quantity,
             is_sale=cart_item.item.is_sale
-        )
+            )
+            order_info=f""" 商品名: {cart_item.item.name}\n 個数: {cart_item.quantity}\n\n"""
+            order_infos += order_info
 
         messages.success(request, '購入ありがとうございます')
         item_num_sum = cart.item_num_sum
         item_price_sum = round(cart.item_price_sum)
-
-
-        cart_item = CartItemModel.objects.filter(cart=cart)
-
-        order_infos=""
-        for item in cart_item:
-            item_name = item.item.name
-            item_quantity = item.quantity
-            order_info=f""" 商品名: {item_name}\n 個数: {item_quantity}\n\n"""
-            order_infos += order_info
-
 
         """題名"""
         subject = "【ご購入ありがとうございます】注文確認メール"
