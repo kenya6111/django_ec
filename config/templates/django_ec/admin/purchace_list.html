@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load app_tag %}
+{% load static %}
+{% block content %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container px-4 px-lg-5">
+        <a class="navbar-brand" href="#!">AI Artifacts</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="#!">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+
+    <!-- DataTales Example -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">購入履歴検索</h6>
+        </div>
+        <form method="GET" action="purchace_list" id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">{% csrf_token %}
+            <div class="card-body container">
+                {% if error_list is not None%}
+                    {% for error in error_list %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                <div class="row">
+                <div class="col-md-12 col-sm-12 ">
+                    <div class="x_panel">
+                        <div class="x_content">
+                            <br/>
+                                <div class="item form-group d-flex mb-2 ">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align">購入日
+                                    </label>
+                                    <div class="col-md-2 col-sm-6 ">
+                                        <input id="birthday1" name="create-date-from" class="date-picker form-control" placeholder="年/月/日" type="text" type="text" onfocus="this.type='date'" onmouseover="this.type='date'" onclick="this.type='date'" onblur="this.type='text'" onmouseout="timeFunctionLong(this)">
+                                        <script>
+                                            function timeFunctionLong(input) {
+                                                setTimeout(function() {
+                                                    input.type = 'text';
+                                                }, 60000);
+                                            }
+                                        </script>
+                                    </div>
+                                    <div class="ms-2 me-2 "><span class="align-middle">~</span></div>
+                                    <div class="col-md-2 col-sm-6 ">
+                                        <input id="birthday2" name="create-date-to" class="date-picker form-control" placeholder="年/月/日" type="text" type="text" onfocus="this.type='date'" onmouseover="this.type='date'" onclick="this.type='date'" onblur="this.type='text'" onmouseout="timeFunctionLong(this)">
+                                        <script>
+                                            function timeFunctionLong(input) {
+                                                setTimeout(function() {
+                                                    input.type = 'text';
+                                                }, 60000);
+                                            }
+                                        </script>
+                                    </div>
+                                  </div>
+                                <div class="ln_solid"></div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-grid gap-2 d-md-block text-center mb-2">
+                <button class="btn btn-primary" type="submit">検索</button>
+            </div>
+        </form>
+
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">購入履歴一覧</h6>
+        </div>
+        <div class="card-body container">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>注文ID</th>
+                            <th>注文日時</th>
+                            <th>商品情報</th>
+                            <th>合計金額</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for object in object_list %}
+                        <tr data-href="{% url 'admin_purchace_detail' object.id %}" class="history-row">
+                            <td>{{ object.id }}</td>
+                            <td>{{ object.created_at|date:"Y-m-j H:i:s" }}</td>
+                            <td>
+                                {% for detail in object.purchase_details.all %}
+                                    {{ detail.item_name }} x {{ detail.quantity }}<br>
+                                {% endfor %}
+                            </td>
+                            <td>{{ object.total_price }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+        <div class="d-grid gap-4 d-md-block text-center mb-2">
+            <a href="{% url 'menu' %}" class="btn btn-secondary " role="button" >戻る</a>
+        </div>
+    </div>
+
+</div>
+{% block javascripts %}
+<script src="{% static 'js/purchace_list.js' %}"></script>
+{% endblock  %}
+
+{% endblock %}

@@ -1,13 +1,18 @@
 from django.shortcuts import get_object_or_404, render, redirect
 
 from config.settings import BASE_DIR
-from django_ec.models import ItemModel,ItemModel,CartModel,CartItemModel
+from django_ec.models import ItemModel,ItemModel,CartModel,CartItemModel,CheckoutModel,PurchaseDetailModel
 import environ
 from .constants.consts import Menu
 from django.views.generic import CreateView,UpdateView,DeleteView, ListView
 from django.urls import reverse_lazy
 from basicauth.decorators import basic_auth_required
 from django.utils.decorators import method_decorator
+from django.contrib import messages
+
+from django.shortcuts import render
+from django.core.mail import BadHeaderError, send_mail
+from django.http import HttpResponse, HttpResponseRedirect
 # Create your views here.
 
 def index(request):
@@ -72,6 +77,28 @@ class ItemDelete (DeleteView):
     model = ItemModel
     success_url = reverse_lazy('admin_list')
 
+@basic_auth_required
+def adminpurchacelistfunc(request):
+    params = {
+        "create_date_from" : request.GET.get("create-date-from", None),
+        "create_date_to" : request.GET.get("create-date-to", None)
+    }
+    checkouts = CheckoutModel.objects.prefetch_related('purchase_details')
+
+     # 作成日の範囲でフィルタリング
+    if params["create_date_from"]:
+        checkouts = checkouts.filter(created_at__gte=params["create_date_from"])
+    if params["create_date_to"]:
+        checkouts = checkouts.filter(created_at__lte=params["create_date_to"])
+
+    return render(request, 'django_ec/admin/purchace_list.html', {"object_list":checkouts})
+
+@basic_auth_required
+def adminpurchacedetailfunc(request, pk):
+    # checkout = CheckoutModel.objects.get(pk=pk)
+    checkout = CheckoutModel.objects.prefetch_related('purchase_details').get(pk=pk)
+    return render(request, 'django_ec/admin/purchace_detail.html', {'checkout':checkout})
+
 def cartdetailfunc(request):
     cart = get_or_create_cart(request)
     item_num_sum = cart.item_num_sum
@@ -101,6 +128,78 @@ def removefromcartfunc(request, pk):
     CartItemModel.objects.get(cart=cart, item=item).delete()
     return redirect('cartdetail')
 
+def checkoutfunc(request):
+    if request.method == 'POST':
+        cart = get_or_create_cart(request)
+        cart_items = cart.cart_items.all()
+        # カート内の総額
+        total_price=0
+        for cart_item in cart_items:
+            if cart_item.item.is_sale:
+                total_price += cart_item.item.price* 0.6 * cart_item.quantity
+            else:
+                total_price += cart_item.item.price * cart_item.quantity
+
+        first_name = request.POST.get("firstName", None)
+        last_name = request.POST.get("lastName", None)
+        username = request.POST.get("username", None)
+        email = request.POST.get("email", None)
+        address1 = request.POST.get("address", None)
+        address2 = request.POST.get("address2", None)
+        country = request.POST.get("country", None)
+        state = request.POST.get("state", None)
+        zip_code = request.POST.get("zip", None)
+        name_card = request.POST.get("nameCard", None)
+        credit_number = request.POST.get("creditNum", None)
+        expiration = request.POST.get("expiration", None)
+        cvv = request.POST.get("cvv", None)
+        checkout = CheckoutModel(cart=cart,first_name=first_name,last_name=last_name,user_name = username,email=email,address1=address1,address2=address2,country=country,state=state,zip_code=zip_code,name_on_card=name_card,credit_number=credit_number,credit_expiration=expiration,cvv=cvv, total_price=total_price)
+        checkout.save()
+
+        cart_items = cart_items.filter(cart=cart)
+        order_infos=""
+        for cart_item in cart_items:
+            if cart_item.item.is_sale:
+                price=cart_item.item.price*0.6
+            else:
+                price=cart_item.item.price
+            PurchaseDetailModel.objects.create(
+            checkout=checkout,
+            item_name=cart_item.item.name,
+            item_price=price,
+            quantity=cart_item.quantity,
+            is_sale=cart_item.item.is_sale
+            )
+            order_info=f""" 商品名: {cart_item.item.name}\n 個数: {cart_item.quantity}\n\n"""
+            order_infos += order_info
+
+        messages.success(request, '購入ありがとうございます')
+        item_num_sum = cart.item_num_sum
+        item_price_sum = round(cart.item_price_sum)
+
+        """題名"""
+        subject = "【ご購入ありがとうございます】注文確認メール"
+        """本文"""
+        message = f"""ご注文いただきありがとうございます。\n以下の内容でご注文を承りました。商品の発送準備が整い次第、再度ご連絡いたします。\n\n【ご注文内容】\n{order_infos} 合計金額: ¥{item_price_sum}（税込）\n\n【お届け先情報】\n  お名前: {last_name} {first_name}\n  住所: {country} {address1} {address2}\n  メールアドレス: {email}\n\n【ご注文番号】\n{cart.id}\nこのメールは送信専用です。ご質問やご不明な点がございましたら、当店のカスタマーサポートまでご連絡ください。\n--------------------------\nDjango_EC\nURL: https://example.com\nメール: support@example.com\n電話番号: 03-1234-5678\n--------------------------\n"""
+
+        """送信元メールアドレス"""
+        from_email = "kenyanke6111@gmail.com"
+        """宛先メールアドレス"""
+        recipient_list = [
+            email
+        ]
+
+
+        send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+
+        # カートを削除
+        cart.delete()
+
+        item_num_sum=0
+        request.session.clear()
+        object_list = ItemModel.objects.all()
+        return render(request, 'django_ec/list.html', {'object_list':object_list, 'item_num_sum':item_num_sum, 'is_checkouted':True })
+    return redirect('list')
 
 def validate(error_list, star_from, star_to, price_from, price_to, create_date_from, create_date_to):
     if len(star_from) !=0 and len(star_to) != 0:
