@@ -14,10 +14,30 @@ function inputChange(){
     {
       totalPrice += itemPrice*itemCount
     }
+    postInputQuantity(itemId,itemCount)
   }
   let element = document.getElementById('item-price-sum');
   element.innerHTML = "$"+totalPrice;
+}
 
+async function postInputQuantity(itemId, itemCount){
+  const csrftoken = Cookies.get('csrftoken');
+  const postBody = {
+      item_id: itemId,
+      item_quantity: itemCount,
+  };
+  console.log(postBody);
+  const postData = {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrftoken,
+      },
+      body: JSON.stringify(postBody)
+  };
+  console.log(postData);
+  const res = await fetch("../updatecart/", postData)
+  console.log(res.json());
 }
 
 

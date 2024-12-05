@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import get_object_or_404, render, redirect
 
 from config.settings import BASE_DIR
@@ -121,6 +122,23 @@ def addcartfunc(request,pk):
 
     return render(request, 'django_ec/list.html', {'object_list':object_list, 'item_num_sum':item_num_sum})
 
+def updatecartfunc(request):
+    if request.method == 'POST':
+        print("post")
+        json_body = request.body.decode("utf-8")
+        body = json.loads(json_body)
+
+        item_id = body["item_id"]
+        item_quantity = body["item_quantity"]
+
+        cart = get_or_create_cart(request)
+        item = ItemModel.objects.get(pk=item_id)
+
+        cart_item = CartItemModel.objects.get(cart=cart, item=item)
+        cart_item.quantity = item_quantity
+        cart_item.save()
+
+    return redirect('cartdetail')
 
 def removefromcartfunc(request, pk):
     cart = get_or_create_cart(request)
