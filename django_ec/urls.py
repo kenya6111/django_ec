@@ -21,6 +21,7 @@ urlpatterns = [
     path("cartdetail/", views.cartdetailfunc, name="cartdetail"),
     path("addtocart/<int:pk>", views.addcartfunc, name="addtocart"),
     path("updatecart/", views.updatecartfunc, name="updatecart"),
-    path("removefromcart/<int:pk>", views.removefromcartfunc, name="removefromcart"),
+    path("checkRedeem/", views.checkredeemfunc, name="checkRedeem"),
+    path("removefromcart/", views.removefromcartfunc, name="removefromcart"),
     path("checkout", views.checkoutfunc, name="checkout"),
 ]

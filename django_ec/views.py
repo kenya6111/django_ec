@@ -2,7 +2,7 @@ import json
 from django.shortcuts import get_object_or_404, render, redirect
 
 from config.settings import BASE_DIR
-from django_ec.models import ItemModel,ItemModel,CartModel,CartItemModel,CheckoutModel,PurchaseDetailModel
+from django_ec.models import ItemModel,ItemModel,CartModel,CartItemModel,CheckoutModel,PurchaseDetailModel,PromotionCodeModel
 import environ
 from .constants.consts import Menu
 from django.views.generic import CreateView,UpdateView,DeleteView, ListView
@@ -14,6 +14,8 @@ from django.contrib import messages
 from django.shortcuts import render
 from django.core.mail import BadHeaderError, send_mail
 from django.http import HttpResponse, HttpResponseRedirect
+from django.http import JsonResponse
+from django.core.exceptions import ObjectDoesNotExist
 # Create your views here.
 
 def index(request):
@@ -35,7 +37,6 @@ def detailfunc(request, pk):
 @basic_auth_required
 def adminmenufunc(request):
     menu_list = list(Menu)
-    print(menu_list)
     return render(request, 'django_ec/admin/menu.html', {'menu_list':menu_list})
 @method_decorator(basic_auth_required, name='dispatch')
 class ItemList(ListView):
@@ -104,7 +105,16 @@ def cartdetailfunc(request):
     cart = get_or_create_cart(request)
     item_num_sum = cart.item_num_sum
     item_price_sum = cart.item_price_sum
-    return render(request, 'django_ec/cart.html', {'object_list':[item for item in cart.cart_items.all()], 'item_num_sum':item_num_sum, 'item_price_sum':round(item_price_sum)})
+
+    redeem_code = request.session.get('redeem_code')
+    redeem = None
+    if redeem_code:
+        redeem = PromotionCodeModel.objects.get(promote_code=redeem_code)
+        item_price_sum = item_price_sum - redeem.discount_amount
+        if item_price_sum < 0:
+            item_price_sum = 0
+
+    return render(request, 'django_ec/cart.html', {'object_list':[item for item in cart.cart_items.all()], 'item_num_sum':item_num_sum, 'item_price_sum':round(item_price_sum), 'redeem':redeem})
 
 def addcartfunc(request,pk):
     # cart = request.session.get('cart_id')
@@ -124,7 +134,6 @@ def addcartfunc(request,pk):
 
 def updatecartfunc(request):
     if request.method == 'POST':
-        print("post")
         json_body = request.body.decode("utf-8")
         body = json.loads(json_body)
 
@@ -140,23 +149,75 @@ def updatecartfunc(request):
 
     return redirect('cartdetail')
 
-def removefromcartfunc(request, pk):
-    cart = get_or_create_cart(request)
-    item = get_object_or_404(ItemModel,pk=pk)
-    CartItemModel.objects.get(cart=cart, item=item).delete()
-    return redirect('cartdetail')
+def checkredeemfunc(request):
+    if request.method == 'POST':
+        try:
+            json_body = request.body.decode("utf-8")
+            body = json.loads(json_body)
+
+            redeem_code = body["redeem_code"]
+            redeem = PromotionCodeModel.objects.get(promote_code=redeem_code)
+            data = {
+                'status':'success',
+                'message':'code found',
+                'redeem': {
+                    'code':redeem.promote_code,
+                    'discount_amount':redeem.discount_amount
+                }
+            }
+
+            request.session['redeem_code'] = redeem_code
+        except ObjectDoesNotExist:
+            data ={
+                'status':'error',
+                'message':'code not found'
+            }
+        except Exception as e:
+            data = {
+                'status': 'error',
+                'message': str(e),
+            }
+    return JsonResponse(data)
+
+def removefromcartfunc(request):
+    if request.method == 'POST':
+        try:
+            json_body = request.body.decode("utf-8")
+            body = json.loads(json_body)
+
+            item_id = body["item_id"]
+            cart = get_or_create_cart(request)
+            item = get_object_or_404(ItemModel,pk=item_id)
+            CartItemModel.objects.get(cart=cart, item=item).delete()
+
+            data ={
+                'status':'success',
+                'message':'item deleted'
+            }
+        except Exception as e:
+            data ={
+                'status':'error',
+                'message':str(e)
+            }
+
+    return JsonResponse(data)
 
 def checkoutfunc(request):
     if request.method == 'POST':
         cart = get_or_create_cart(request)
         cart_items = cart.cart_items.all()
         # カート内の総額
+        redeem_price = request.POST.get("redeem-price", "0")
+
         total_price=0
         for cart_item in cart_items:
             if cart_item.item.is_sale:
                 total_price += cart_item.item.price* 0.6 * cart_item.quantity
             else:
                 total_price += cart_item.item.price * cart_item.quantity
+
+        if redeem_price:
+            total_price = total_price - int(redeem_price)
 
         first_name = request.POST.get("firstName", None)
         last_name = request.POST.get("lastName", None)
