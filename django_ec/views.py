@@ -155,18 +155,26 @@ def checkredeemfunc(request):
             json_body = request.body.decode("utf-8")
             body = json.loads(json_body)
 
+            # プロモーションコードがDBに存在するか確認
             redeem_code = body["redeem_code"]
             redeem = PromotionCodeModel.objects.get(promote_code=redeem_code)
-            data = {
-                'status':'success',
-                'message':'code found',
-                'redeem': {
-                    'code':redeem.promote_code,
-                    'discount_amount':redeem.discount_amount
+            if redeem.is_used:
+                data ={
+                    'status':'error',
+                    'message':'already used'
                 }
-            }
-
-            request.session['redeem_code'] = redeem_code
+            else:
+                data = {
+                    'status':'success',
+                    'message':'code found',
+                    'redeem': {
+                        'code':redeem.promote_code,
+                        'discount_amount':redeem.discount_amount
+                    }
+                }
+                redeem.is_used = True
+                redeem.save()
+                request.session['redeem_code'] = redeem_code
         except ObjectDoesNotExist:
             data ={
                 'status':'error',

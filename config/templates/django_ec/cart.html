@@ -132,6 +132,12 @@
           <!-- <input type="hidden" id="item-price" name="item-price-sum" value="{{ item_price_sum }}" /> -->
         </ul>
 
+          <div class="alert alert-danger d-none" id="code-invalid" role="alert">
+            プロモーションコードが不正です
+          </div>
+          <div class="alert alert-danger d-none" id="code-used" role="alert">
+            入力されたプロモーションコードは使用済です
+          </div>
         <div class="card p-2">
           <div class="input-group">
             <input type="text" class="form-control" id="redeem-input" placeholder="Promo code">

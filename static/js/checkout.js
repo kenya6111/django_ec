@@ -76,11 +76,15 @@ async function deleteClick(itemId){
 
 async function redeemClick(){
   // 入力プロモーションコード取得
-  const inputRedeem = document.getElementById('redeem-input').value
-  debugger
+  const inputRedeem = document.getElementById('redeem-input')
+  const codeInvalid = document.getElementById('code-invalid');
+  const codeUsed = document.getElementById('code-used');
   const csrftoken = Cookies.get('csrftoken');
+  codeInvalid.classList.add('d-none')
+  codeUsed.classList.add('d-none')
+
   const postBody = {
-      redeem_code: inputRedeem
+      redeem_code: inputRedeem.value
   };
   const postData = {
       method: "POST",
@@ -100,7 +104,7 @@ async function redeemClick(){
 
     // 入力プロモーションコードを画面表示
     const displayRedeemCode = document.getElementsByClassName('redeem-display')[0].getElementsByTagName('small')[0];
-    displayRedeemCode.textContent=inputRedeem
+    displayRedeemCode.textContent=inputRedeem.value
 
     // 割引額を画面表示
     const displayRedeemPrice = document.getElementsByClassName('redeem-display')[0].getElementsByTagName('span')[0];
@@ -113,9 +117,19 @@ async function redeemClick(){
     const itemPriceSumEle = document.getElementById('item-price-sum');
     itemPriceSumEle.textContent = Number(itemPriceSumEle.textContent.substring(1)) - data.redeem.discount_amount
 
+    // プロモーションコード入力欄をリセット
+    document.getElementById('redeem-input').value=""
   } else {
     console.log('失敗:', data.message);
     // 失敗時のUI更新
+    // エラーメッセージを表示
+    if(data.message === 'code not found'){
+      codeInvalid.classList.remove('d-none')
+    }
+    // エラーメッセージを表示
+    if(data.message === 'already used'){
+      codeUsed.classList.remove('d-none')
+    }
   }
 }
 
