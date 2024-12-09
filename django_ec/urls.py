@@ -4,7 +4,7 @@ from django.urls import path
 from django.views.generic.base import TemplateView
 from . import views
 
-from .views import listfunc, detailfunc, adminmenufunc,ItemList,ItemCreate,ItemEdit,ItemDelete,cartdetailfunc,addcartfunc,removefromcartfunc,checkoutfunc,adminpurchacelistfunc
+from .views import listfunc, detailfunc, adminmenufunc,ItemList,ItemCreate,ItemEdit,ItemDelete,cartdetailfunc,addcartfunc,removefromcartfunc,checkoutfunc,adminpurchacelistfunc,updatecartfunc
 
 
 urlpatterns = [
@@ -20,6 +20,8 @@ urlpatterns = [
     path("admin/purchace_detail/<int:pk>", views.adminpurchacedetailfunc, name="admin_purchace_detail"),
     path("cartdetail/", views.cartdetailfunc, name="cartdetail"),
     path("addtocart/<int:pk>", views.addcartfunc, name="addtocart"),
-    path("removefromcart/<int:pk>", views.removefromcartfunc, name="removefromcart"),
+    path("updatecart/", views.updatecartfunc, name="updatecart"),
+    path("checkRedeem/", views.checkredeemfunc, name="checkRedeem"),
+    path("removefromcart/", views.removefromcartfunc, name="removefromcart"),
     path("checkout", views.checkoutfunc, name="checkout"),
 ]
