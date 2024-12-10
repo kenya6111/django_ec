@@ -58,7 +58,7 @@ class ItemModel(models.Model):
     # author = models.CharField(max_length=100)
     # readText = models.TextField(null=True, blank=True, default='a')
     def __str__(self):
-        return self.name
+        return self.name +" id:"+ str(self.id)
     class Meta:
         db_table = 'items'
 
@@ -81,6 +81,9 @@ class CartItemModel(models.Model):
     quantity = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return "cart_id:" + str(self.cart.id) + ", item_id:"+str(self.item.id)+", quantity:"+str(self.quantity)
 
 class CheckoutModel(models.Model):
     cart = models.OneToOneField(CartModel, on_delete=models.SET_NULL, related_name='checkout', null=True, blank=True)
@@ -113,5 +116,13 @@ class PurchaseDetailModel(models.Model):
 
     objects = PurchaseDetaiQuerySet.as_manager()
 
+
+class PromotionCodeModel(models.Model):
+    promote_code = models.CharField(max_length=100)
+    discount_amount = models.IntegerField(default=0)
+    is_used = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.promote_code) +": "+ str(self.discount_amount)
 
 

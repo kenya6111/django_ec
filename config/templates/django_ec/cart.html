@@ -66,7 +66,7 @@
         </h4>
         <ul class="list-group mb-3">
           {% for object in object_list %}
-          <li class="list-group-item d-flex justify-content-between lh-sm list-group-item-product">
+          <li class="list-group-item d-flex justify-content-between lh-sm list-group-item-product" id="list-group-item-product-{{ object.item.id }}">
             <div>
               <h6 class="my-0">{{ object.item.name }}</h6>
               <small class="text-body-secondary">Brief description</small>
@@ -104,7 +104,7 @@
                 {% endif %}
               </span>
               <!-- <button class="btn btn-danger btn-sm mt-auto">削除</button> -->
-              <a class="btn btn-danger btn-sm mt-auto" role="button" href="{% url 'removefromcart' object.item.id %}">削除</a>
+              <a class="btn btn-danger btn-sm mt-auto" role="button" onclick="deleteClick('{{ object.item.id }}')">削除</a>
             </div>
             <!-- <span><p>✖️{{ v }}</p></span> -->
             <input type="hidden" class="item-id" name="item-id" value="{{ object.item.id }}" />
@@ -113,12 +113,17 @@
             <input type="hidden" id="item-price-{{ object.item.id}}" name="item-price-{{ object.item.id}}" value="{{ object.item.price }}" />
           </li>
           {% endfor %}
-          <li class="list-group-item d-flex justify-content-between bg-body-tertiary">
+
+          {% if redeem.discount_amount %}
+          <li class="list-group-item d-flex justify-content-between bg-body-tertiary redeem-display">
+          {% else %}
+          <li class="list-group-item d-flex justify-content-between bg-body-tertiary d-none redeem-display">
+          {% endif %}
             <div class="text-success">
               <h6 class="my-0">Promo code</h6>
-              <small>EXAMPLECODE</small>
+              <small>{{ redeem.promote_code }}</small>
             </div>
-            <span class="text-success">−$5</span>
+            <span class="text-success">-${{ redeem.discount_amount }}</span>
           </li>
           <li class="list-group-item d-flex justify-content-between">
             <span>Total (USD)</span>
@@ -127,12 +132,18 @@
           <!-- <input type="hidden" id="item-price" name="item-price-sum" value="{{ item_price_sum }}" /> -->
         </ul>
 
-        <form class="card p-2">
-          <div class="input-group">
-            <input type="text" class="form-control" placeholder="Promo code">
-            <button type="submit" class="btn btn-secondary">Redeem</button>
+          <div class="alert alert-danger d-none" id="code-invalid" role="alert">
+            プロモーションコードが不正です
           </div>
-        </form>
+          <div class="alert alert-danger d-none" id="code-used" role="alert">
+            入力されたプロモーションコードは使用済です
+          </div>
+        <div class="card p-2">
+          <div class="input-group">
+            <input type="text" class="form-control" id="redeem-input" placeholder="Promo code">
+            <button type="submit" class="btn btn-secondary " onclick="redeemClick()">redeem</button>
+          </div>
+        </div>
         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-2">
           <a href="{% url 'list' %}" class="btn btn-secondary" tabindex="-1" role="button">トップへ戻る</a>
         </div>
@@ -276,6 +287,8 @@
           <hr class="my-4">
           <!-- <a href="{% url 'checkout'%}" class="w-100 btn btn-primary btn-lg" type="submit" >購入する</a> -->
           <button class="w-100 btn btn-primary btn-lg" type="submit">購入する</button>
+
+          <input type="hidden" name="redeem-price" value="{{ redeem.discount_amount }}" />
         </form>
       </div>
     </div>
